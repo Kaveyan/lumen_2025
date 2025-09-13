@@ -25,10 +25,11 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setError('');
+    setSuccess('');
+    setLoading(true);
 
-    // Validation
+    // Basic validation
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
       setLoading(false);
@@ -36,25 +37,52 @@ const Register = () => {
     }
 
     if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters');
+      setError('Password must be at least 6 characters long');
       setLoading(false);
       return;
     }
 
     try {
-      // Mock registration - in real app, this would call backend API
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Mock success
-      localStorage.setItem('user', JSON.stringify({
-        email: formData.email,
-        userType: 'user',
-        name: `${formData.firstName} ${formData.lastName}`
-      }));
-      
-      navigate('/my-subscriptions');
-    } catch (err) {
-      setError('Registration failed. Please try again.');
+      const response = await fetch('http://localhost:5000/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          role: formData.role || 'user',
+          phone: formData.phone
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setSuccess('Account created successfully! Redirecting...');
+        
+        // Store authentication data
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        localStorage.setItem('isAuthenticated', 'true');
+
+        // Redirect based on role
+        setTimeout(() => {
+          if (data.user.role === 'admin') {
+            navigate('/admin/dashboard');
+          } else {
+            navigate('/dashboard');
+          }
+        }, 2000);
+      } else {
+        setError(data.message || 'Registration failed');
+      }
+
+    } catch (error) {
+      console.error('Registration error:', error);
+      setError('Network error. Please check if the server is running.');
     } finally {
       setLoading(false);
     }

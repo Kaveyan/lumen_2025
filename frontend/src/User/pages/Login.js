@@ -1,15 +1,14 @@
 // Simple login component for both users and admins
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
   const [formData, setFormData] = useState({
     email: '',
-    password: '',
-    userType: 'user'
+    password: ''
   });
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -17,40 +16,44 @@ const Login = () => {
       ...formData,
       [e.target.name]: e.target.value
     });
-    setError(''); // Clear error when user types
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setError('');
+    setIsLoading(true);
 
     try {
-      // Mock authentication - in real app, this would call backend API
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Mock validation
-      if (formData.email === 'demo@lumen.com' && formData.password === 'demo123') {
-        // Store user info in localStorage (in real app, use proper auth tokens)
-        localStorage.setItem('user', JSON.stringify({
-          email: formData.email,
-          userType: formData.userType,
-          name: 'Demo User'
-        }));
-        
-        // Redirect based on user type
-        if (formData.userType === 'admin') {
+      const response = await fetch('http://localhost:5000/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Store authentication data
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        localStorage.setItem('isAuthenticated', 'true');
+
+        // Navigate based on user role
+        if (data.user.role === 'admin') {
           navigate('/admin/dashboard');
         } else {
-          navigate('/my-subscriptions');
+          navigate('/dashboard');
         }
       } else {
-        setError('Invalid email or password. Try demo@lumen.com / demo123');
+        setError(data.message || 'Login failed');
       }
-    } catch (err) {
-      setError('Login failed. Please try again.');
+    } catch (error) {
+      console.error('Login error:', error);
+      setError('Network error. Please check if the server is running.');
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -70,28 +73,15 @@ const Login = () => {
           )}
 
           <div style={fieldGroupStyle}>
-            <label style={labelStyle}>User Type</label>
-            <select
-              name="userType"
-              value={formData.userType}
-              onChange={handleChange}
-              style={selectStyle}
-            >
-              <option value="user">Customer</option>
-              <option value="admin">Administrator</option>
-            </select>
-          </div>
-
-          <div style={fieldGroupStyle}>
             <label style={labelStyle}>Email Address</label>
             <input
               type="email"
               name="email"
               value={formData.email}
               onChange={handleChange}
-              placeholder="Enter your email"
-              style={inputStyle}
               required
+              style={inputStyle}
+              placeholder="Enter your email"
             />
           </div>
 
@@ -102,37 +92,37 @@ const Login = () => {
               name="password"
               value={formData.password}
               onChange={handleChange}
-              placeholder="Enter your password"
-              style={inputStyle}
               required
+              style={inputStyle}
+              placeholder="Enter your password"
             />
           </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            style={{
-              ...submitButtonStyle,
-              ...(loading ? disabledButtonStyle : {})
-            }}
+          <button 
+            type="submit" 
+            disabled={isLoading}
+            style={isLoading ? {...submitButtonStyle, ...disabledButtonStyle} : submitButtonStyle}
           >
-            {loading ? 'Signing in...' : 'Sign In'}
+            {isLoading ? 'Signing In...' : 'Sign In'}
           </button>
-
-          <div style={linksStyle}>
-            <Link to="/forgot-password" style={linkStyle}>
-              Forgot your password?
-            </Link>
-          </div>
         </form>
+
+        <div style={demoInfoStyle}>
+          <h3 style={demoTitleStyle}>Demo Instructions</h3>
+          <div>
+            <p><strong>New User?</strong> <a href="/register" style={linkStyle}>Create Account</a></p>
+            <p>Register with any email and password to get started.</p>
+            <p>Choose 'admin' role during registration for admin access.</p>
+          </div>
+        </div>
 
         <div style={dividerStyle}>
           <span style={dividerTextStyle}>Don't have an account?</span>
         </div>
 
-        <Link to="/register" style={registerButtonStyle}>
+        <a href="/register" style={registerButtonStyle}>
           Create New Account
-        </Link>
+        </a>
 
         <div style={demoInfoStyle}>
           <h4 style={demoTitleStyle}>Demo Credentials</h4>

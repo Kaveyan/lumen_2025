@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 require('dotenv').config();
 
 const aiRoutes = require('./routes/aiRoutes');
+const authRoutes = require('./routes/authRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -13,7 +14,18 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// MongoDB Connection
+mongoose.connect(process.env.MONGODB_URI)
+    .then(() => {
+        console.log('✅ Connected to MongoDB successfully');
+    })
+    .catch((error) => {
+        console.error('❌ MongoDB connection error:', error);
+        process.exit(1);
+    });
+
 // Routes
+app.use('/api/auth', authRoutes);
 app.use('/api/ai', aiRoutes);
 
 // Basic health check
@@ -32,6 +44,7 @@ app.get('/', (req, res) => {
         version: '1.0.0',
         endpoints: {
             health: '/health',
+            auth: '/api/auth/*',
             ai: '/api/ai/*'
         }
     });

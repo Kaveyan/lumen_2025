@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   AppBar,
@@ -33,28 +33,16 @@ import {
   Logout,
   AdminPanelSettings,
 } from '@mui/icons-material';
+import { useAuth } from '../../contexts/AuthContext';
 
 const Navbar = () => {
-  const [user, setUser] = useState(null);
+  const { user, isAuthenticated, logout } = useAuth();
   const [anchorEl, setAnchorEl] = useState(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-
-  useEffect(() => {
-    const userData = localStorage.getItem('user');
-    const isAuthenticated = localStorage.getItem('isAuthenticated');
-    
-    if (userData && isAuthenticated === 'true') {
-      try {
-        setUser(JSON.parse(userData));
-      } catch (error) {
-        console.error('Error parsing user data:', error);
-      }
-    }
-  }, [location]);
 
   const handleProfileMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -65,10 +53,7 @@ const Navbar = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    localStorage.removeItem('isAuthenticated');
-    setUser(null);
+    logout();
     setAnchorEl(null);
     navigate('/');
   };
@@ -77,13 +62,32 @@ const Navbar = () => {
     setMobileOpen(!mobileOpen);
   };
 
-  const navigationItems = [
+  const publicNavigationItems = [
+    { label: 'Home', path: '/', icon: <Home /> },
+    { label: 'Plans', path: '/plans', icon: <ViewList /> },
+  ];
+
+  const customerNavigationItems = [
     { label: 'Home', path: '/', icon: <Home /> },
     { label: 'Plans', path: '/plans', icon: <ViewList /> },
     { label: 'AI Recommendations', path: '/recommendations', icon: <Psychology /> },
     { label: 'My Subscriptions', path: '/my-subscriptions', icon: <Subscriptions /> },
     { label: 'Offers', path: '/discounts', icon: <LocalOffer /> },
   ];
+
+  const adminNavigationItems = [
+    { label: 'Home', path: '/', icon: <Home /> },
+    { label: 'Plans', path: '/plans', icon: <ViewList /> },
+    { label: 'AI Recommendations', path: '/admin/recommendations', icon: <Psychology /> },
+    { label: 'Offers', path: '/discounts', icon: <LocalOffer /> },
+  ];
+
+  const getNavigationItems = () => {
+    if (!user) return publicNavigationItems;
+    return user.role === 'admin' ? adminNavigationItems : customerNavigationItems;
+  };
+
+  const navigationItems = getNavigationItems();
 
   const drawer = (
     <Box onClick={handleDrawerToggle} sx={{ textAlign: 'center' }}>
@@ -130,22 +134,18 @@ const Navbar = () => {
             )}
 
             {/* Logo */}
-            <Typography
-              variant="h5"
-              component={Link}
-              to="/"
-              sx={{
-                mr: 4,
-                display: 'flex',
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Typography variant="h6" component={Link} to="/" sx={{ 
+                textDecoration: 'none', 
+                color: 'inherit',
                 fontWeight: 700,
-                color: 'primary.main',
-                textDecoration: 'none',
+                display: 'flex',
                 alignItems: 'center',
-                flexGrow: isMobile ? 1 : 0,
-              }}
-            >
-              🌐 Lumen Broadband
-            </Typography>
+                gap: 1
+              }}>
+                🌐 Lumen Broadband
+              </Typography>
+            </Box>
 
             {/* Desktop Navigation */}
             <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' }, gap: 1 }}>

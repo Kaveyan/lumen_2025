@@ -1,305 +1,350 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import {
+  Container,
+  Grid,
+  Card,
+  CardContent,
+  Typography,
+  Button,
+  Box,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Chip
+} from '@mui/material';
+import {
+  Speed,
+  Psychology,
+  AttachMoney,
+  Support,
+  CheckCircle,
+  Wifi,
+  Security,
+  TrendingUp
+} from '@mui/icons-material';
 
 const Home = () => {
   return (
-    <div style={containerStyle}>
+    <Box>
       {/* Hero Section */}
-      <section style={heroStyle}>
-        <div style={heroContentStyle}>
-          <h1 style={heroTitleStyle}>
+      <Box
+        sx={{
+          background: 'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)',
+          color: 'white',
+          py: 8,
+          textAlign: 'center',
+          position: 'relative',
+          overflow: 'hidden',
+        }}
+      >
+        <Container maxWidth="lg">
+          <Typography variant="h2" component="h1" gutterBottom sx={{ fontWeight: 700, mb: 2 }}>
             🌐 Welcome to Lumen Broadband
-          </h1>
-          <p style={heroSubtitleStyle}>
+          </Typography>
+          <Typography variant="h4" gutterBottom sx={{ mb: 3, opacity: 0.9 }}>
             AI-Powered Subscription Management for Modern Connectivity
-          </p>
-          <p style={heroDescStyle}>
+          </Typography>
+          <Typography variant="h6" sx={{ mb: 4, opacity: 0.8, maxWidth: 600, mx: 'auto' }}>
             Experience lightning-fast internet with our intelligent platform that learns your usage patterns 
             and recommends the perfect plan for your needs.
-          </p>
-          <div style={heroButtonsStyle}>
-            <Link to="/plans" style={primaryButtonStyle}>
+          </Typography>
+          <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <Button
+              component={Link}
+              to="/plans"
+              variant="contained"
+              size="large"
+              sx={{
+                bgcolor: 'white',
+                color: 'primary.main',
+                px: 4,
+                py: 1.5,
+                fontSize: '1.1rem',
+                fontWeight: 600,
+                '&:hover': { bgcolor: 'grey.100' }
+              }}
+            >
               View Plans
-            </Link>
-            <Link to="/recommendations" style={secondaryButtonStyle}>
-              🤖 Get AI Recommendations
-            </Link>
-          </div>
-        </div>
-      </section>
+            </Button>
+            <Button
+              component={Link}
+              to="/recommendations"
+              variant="outlined"
+              size="large"
+              startIcon={<Psychology />}
+              sx={{
+                borderColor: 'white',
+                color: 'white',
+                px: 4,
+                py: 1.5,
+                fontSize: '1.1rem',
+                fontWeight: 600,
+                '&:hover': { bgcolor: 'rgba(255,255,255,0.1)', borderColor: 'white' }
+              }}
+            >
+              Get AI Recommendations
+            </Button>
+          </Box>
+        </Container>
+      </Box>
 
       {/* Features Section */}
-      <section style={featuresStyle}>
-        <div style={sectionContentStyle}>
-          <h2 style={sectionTitleStyle}>Why Choose Lumen Broadband?</h2>
-          <div style={featuresGridStyle}>
-            <div style={featureCardStyle}>
-              <div style={featureIconStyle}>⚡</div>
-              <h3 style={featureHeadingStyle}>Lightning Fast</h3>
-              <p style={featureTextStyle}>
+      <Container maxWidth="lg" sx={{ py: 8 }}>
+        <Typography variant="h3" component="h2" textAlign="center" gutterBottom sx={{ fontWeight: 700, color: 'primary.main', mb: 6 }}>
+          Why Choose Lumen Broadband?
+        </Typography>
+        <Grid container spacing={4}>
+          <Grid item xs={12} sm={6} md={3}>
+            <Card elevation={3} sx={{ height: '100%', textAlign: 'center', p: 3 }}>
+              <Speed sx={{ fontSize: 60, color: 'primary.main', mb: 2 }} />
+              <Typography variant="h5" gutterBottom sx={{ fontWeight: 600, color: 'primary.main' }}>
+                Lightning Fast
+              </Typography>
+              <Typography color="text.secondary">
                 Up to 1 Gbps speeds with our fiber-optic network
-              </p>
-            </div>
-            <div style={featureCardStyle}>
-              <div style={featureIconStyle}>🤖</div>
-              <h3 style={featureHeadingStyle}>AI-Powered</h3>
-              <p style={featureTextStyle}>
+              </Typography>
+            </Card>
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <Card elevation={3} sx={{ height: '100%', textAlign: 'center', p: 3 }}>
+              <Psychology sx={{ fontSize: 60, color: 'secondary.main', mb: 2 }} />
+              <Typography variant="h5" gutterBottom sx={{ fontWeight: 600, color: 'secondary.main' }}>
+                AI-Powered
+              </Typography>
+              <Typography color="text.secondary">
                 Smart recommendations based on your usage patterns
-              </p>
-            </div>
-            <div style={featureCardStyle}>
-              <div style={featureIconStyle}>💰</div>
-              <h3 style={featureHeadingStyle}>Best Value</h3>
-              <p style={featureTextStyle}>
+              </Typography>
+            </Card>
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <Card elevation={3} sx={{ height: '100%', textAlign: 'center', p: 3 }}>
+              <AttachMoney sx={{ fontSize: 60, color: 'success.main', mb: 2 }} />
+              <Typography variant="h5" gutterBottom sx={{ fontWeight: 600, color: 'success.main' }}>
+                Best Value
+              </Typography>
+              <Typography color="text.secondary">
                 Competitive pricing with no hidden fees
-              </p>
-            </div>
-            <div style={featureCardStyle}>
-              <div style={featureIconStyle}>🔧</div>
-              <h3 style={featureHeadingStyle}>24/7 Support</h3>
-              <p style={featureTextStyle}>
+              </Typography>
+            </Card>
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <Card elevation={3} sx={{ height: '100%', textAlign: 'center', p: 3 }}>
+              <Support sx={{ fontSize: 60, color: 'warning.main', mb: 2 }} />
+              <Typography variant="h5" gutterBottom sx={{ fontWeight: 600, color: 'warning.main' }}>
+                24/7 Support
+              </Typography>
+              <Typography color="text.secondary">
                 Round-the-clock technical support when you need it
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+              </Typography>
+            </Card>
+          </Grid>
+        </Grid>
+      </Container>
 
-      {/* Quick Plans Preview */}
-      <section style={plansPreviewStyle}>
-        <div style={sectionContentStyle}>
-          <h2 style={sectionTitleStyle}>Popular Plans</h2>
-          <div style={plansGridStyle}>
-            <div style={planCardStyle}>
-              <h3 style={planNameStyle}>Basic Fiber</h3>
-              <div style={planPriceStyle}>$39.99<span style={planPeriodStyle}>/month</span></div>
-              <ul style={planFeaturesStyle}>
-                <li>100 Mbps Download</li>
-                <li>20 Mbps Upload</li>
-                <li>Unlimited Data</li>
-                <li>Free Installation</li>
-              </ul>
-              <Link to="/plans" style={planButtonStyle}>Choose Plan</Link>
-            </div>
-            <div style={planCardStyle}>
-              <h3 style={planNameStyle}>Premium Fiber</h3>
-              <div style={planPriceStyle}>$59.99<span style={planPeriodStyle}>/month</span></div>
-              <ul style={planFeaturesStyle}>
-                <li>500 Mbps Download</li>
-                <li>100 Mbps Upload</li>
-                <li>Unlimited Data</li>
-                <li>Free Router</li>
-              </ul>
-              <Link to="/plans" style={planButtonStyle}>Choose Plan</Link>
-            </div>
-            <div style={planCardStyle}>
-              <h3 style={planNameStyle}>Ultra Fiber</h3>
-              <div style={planPriceStyle}>$89.99<span style={planPeriodStyle}>/month</span></div>
-              <ul style={planFeaturesStyle}>
-                <li>1 Gbps Download</li>
-                <li>500 Mbps Upload</li>
-                <li>Unlimited Data</li>
-                <li>Priority Support</li>
-              </ul>
-              <Link to="/plans" style={planButtonStyle}>Choose Plan</Link>
-            </div>
-          </div>
-          <div style={viewAllStyle}>
-            <Link to="/plans" style={viewAllButtonStyle}>View All Plans</Link>
-          </div>
-        </div>
-      </section>
-    </div>
+      {/* Popular Plans Section */}
+      <Box sx={{ bgcolor: 'grey.50', py: 8 }}>
+        <Container maxWidth="lg">
+          <Typography variant="h3" component="h2" textAlign="center" gutterBottom sx={{ fontWeight: 700, color: 'primary.main', mb: 6 }}>
+            Popular Plans
+          </Typography>
+          <Grid container spacing={4} sx={{ mb: 4 }}>
+            <Grid item xs={12} md={4}>
+              <Card elevation={4} sx={{ height: '100%', position: 'relative' }}>
+                <CardContent sx={{ p: 4, textAlign: 'center' }}>
+                  <Typography variant="h4" gutterBottom sx={{ fontWeight: 600, color: 'primary.main' }}>
+                    Basic Fiber
+                  </Typography>
+                  <Box sx={{ mb: 3 }}>
+                    <Typography variant="h3" component="span" sx={{ fontWeight: 700, color: 'primary.main' }}>
+                      $39.99
+                    </Typography>
+                    <Typography variant="h6" component="span" color="text.secondary">
+                      /month
+                    </Typography>
+                  </Box>
+                  <List sx={{ mb: 3 }}>
+                    <ListItem sx={{ px: 0 }}>
+                      <ListItemIcon><CheckCircle color="success" /></ListItemIcon>
+                      <ListItemText primary="100 Mbps Download" />
+                    </ListItem>
+                    <ListItem sx={{ px: 0 }}>
+                      <ListItemIcon><CheckCircle color="success" /></ListItemIcon>
+                      <ListItemText primary="20 Mbps Upload" />
+                    </ListItem>
+                    <ListItem sx={{ px: 0 }}>
+                      <ListItemIcon><CheckCircle color="success" /></ListItemIcon>
+                      <ListItemText primary="Unlimited Data" />
+                    </ListItem>
+                    <ListItem sx={{ px: 0 }}>
+                      <ListItemIcon><CheckCircle color="success" /></ListItemIcon>
+                      <ListItemText primary="Free Installation" />
+                    </ListItem>
+                  </List>
+                  <Button
+                    component={Link}
+                    to="/plans"
+                    variant="contained"
+                    fullWidth
+                    size="large"
+                    sx={{ py: 1.5 }}
+                  >
+                    Choose Plan
+                  </Button>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <Card elevation={6} sx={{ height: '100%', position: 'relative', border: '2px solid', borderColor: 'primary.main' }}>
+                <Chip
+                  label="Most Popular"
+                  color="primary"
+                  sx={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)' }}
+                />
+                <CardContent sx={{ p: 4, textAlign: 'center' }}>
+                  <Typography variant="h4" gutterBottom sx={{ fontWeight: 600, color: 'primary.main' }}>
+                    Premium Fiber
+                  </Typography>
+                  <Box sx={{ mb: 3 }}>
+                    <Typography variant="h3" component="span" sx={{ fontWeight: 700, color: 'primary.main' }}>
+                      $59.99
+                    </Typography>
+                    <Typography variant="h6" component="span" color="text.secondary">
+                      /month
+                    </Typography>
+                  </Box>
+                  <List sx={{ mb: 3 }}>
+                    <ListItem sx={{ px: 0 }}>
+                      <ListItemIcon><CheckCircle color="success" /></ListItemIcon>
+                      <ListItemText primary="500 Mbps Download" />
+                    </ListItem>
+                    <ListItem sx={{ px: 0 }}>
+                      <ListItemIcon><CheckCircle color="success" /></ListItemIcon>
+                      <ListItemText primary="100 Mbps Upload" />
+                    </ListItem>
+                    <ListItem sx={{ px: 0 }}>
+                      <ListItemIcon><CheckCircle color="success" /></ListItemIcon>
+                      <ListItemText primary="Unlimited Data" />
+                    </ListItem>
+                    <ListItem sx={{ px: 0 }}>
+                      <ListItemIcon><CheckCircle color="success" /></ListItemIcon>
+                      <ListItemText primary="Free Router" />
+                    </ListItem>
+                  </List>
+                  <Button
+                    component={Link}
+                    to="/plans"
+                    variant="contained"
+                    fullWidth
+                    size="large"
+                    sx={{ py: 1.5 }}
+                  >
+                    Choose Plan
+                  </Button>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <Card elevation={4} sx={{ height: '100%', position: 'relative' }}>
+                <CardContent sx={{ p: 4, textAlign: 'center' }}>
+                  <Typography variant="h4" gutterBottom sx={{ fontWeight: 600, color: 'primary.main' }}>
+                    Ultra Fiber
+                  </Typography>
+                  <Box sx={{ mb: 3 }}>
+                    <Typography variant="h3" component="span" sx={{ fontWeight: 700, color: 'primary.main' }}>
+                      $89.99
+                    </Typography>
+                    <Typography variant="h6" component="span" color="text.secondary">
+                      /month
+                    </Typography>
+                  </Box>
+                  <List sx={{ mb: 3 }}>
+                    <ListItem sx={{ px: 0 }}>
+                      <ListItemIcon><CheckCircle color="success" /></ListItemIcon>
+                      <ListItemText primary="1 Gbps Download" />
+                    </ListItem>
+                    <ListItem sx={{ px: 0 }}>
+                      <ListItemIcon><CheckCircle color="success" /></ListItemIcon>
+                      <ListItemText primary="500 Mbps Upload" />
+                    </ListItem>
+                    <ListItem sx={{ px: 0 }}>
+                      <ListItemIcon><CheckCircle color="success" /></ListItemIcon>
+                      <ListItemText primary="Unlimited Data" />
+                    </ListItem>
+                    <ListItem sx={{ px: 0 }}>
+                      <ListItemIcon><CheckCircle color="success" /></ListItemIcon>
+                      <ListItemText primary="Priority Support" />
+                    </ListItem>
+                  </List>
+                  <Button
+                    component={Link}
+                    to="/plans"
+                    variant="contained"
+                    fullWidth
+                    size="large"
+                    sx={{ py: 1.5 }}
+                  >
+                    Choose Plan
+                  </Button>
+                </CardContent>
+              </Card>
+            </Grid>
+          </Grid>
+          <Box textAlign="center">
+            <Button
+              component={Link}
+              to="/plans"
+              variant="outlined"
+              size="large"
+              sx={{ px: 4, py: 1.5, fontSize: '1.1rem' }}
+            >
+              View All Plans
+            </Button>
+          </Box>
+        </Container>
+      </Box>
+
+      {/* Trust Indicators */}
+      <Container maxWidth="lg" sx={{ py: 6 }}>
+        <Grid container spacing={4} alignItems="center">
+          <Grid item xs={12} md={4}>
+            <Box textAlign="center">
+              <Security sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
+              <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
+                99.9% Uptime
+              </Typography>
+              <Typography color="text.secondary">
+                Reliable service you can count on
+              </Typography>
+            </Box>
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <Box textAlign="center">
+              <Wifi sx={{ fontSize: 48, color: 'secondary.main', mb: 2 }} />
+              <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
+                Fiber Network
+              </Typography>
+              <Typography color="text.secondary">
+                Future-proof technology
+              </Typography>
+            </Box>
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <Box textAlign="center">
+              <TrendingUp sx={{ fontSize: 48, color: 'success.main', mb: 2 }} />
+              <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
+                No Contracts
+              </Typography>
+              <Typography color="text.secondary">
+                Flexible plans that grow with you
+              </Typography>
+            </Box>
+          </Grid>
+        </Grid>
+      </Container>
+    </Box>
   );
-};
-
-// Styles
-const containerStyle = {
-  minHeight: '100vh'
-};
-
-const heroStyle = {
-  background: 'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)',
-  color: 'white',
-  padding: '4rem 0',
-  textAlign: 'center'
-};
-
-const heroContentStyle = {
-  maxWidth: '800px',
-  margin: '0 auto',
-  padding: '0 2rem'
-};
-
-const heroTitleStyle = {
-  fontSize: '3rem',
-  fontWeight: 'bold',
-  marginBottom: '1rem',
-  lineHeight: '1.2'
-};
-
-const heroSubtitleStyle = {
-  fontSize: '1.5rem',
-  marginBottom: '1rem',
-  opacity: '0.9'
-};
-
-const heroDescStyle = {
-  fontSize: '1.1rem',
-  marginBottom: '2rem',
-  opacity: '0.8',
-  lineHeight: '1.6'
-};
-
-const heroButtonsStyle = {
-  display: 'flex',
-  gap: '1rem',
-  justifyContent: 'center',
-  flexWrap: 'wrap'
-};
-
-const primaryButtonStyle = {
-  backgroundColor: '#ffffff',
-  color: '#1e3a8a',
-  padding: '1rem 2rem',
-  borderRadius: '8px',
-  textDecoration: 'none',
-  fontWeight: 'bold',
-  fontSize: '1.1rem',
-  transition: 'transform 0.3s'
-};
-
-const secondaryButtonStyle = {
-  backgroundColor: 'transparent',
-  color: 'white',
-  padding: '1rem 2rem',
-  border: '2px solid white',
-  borderRadius: '8px',
-  textDecoration: 'none',
-  fontWeight: 'bold',
-  fontSize: '1.1rem',
-  transition: 'background-color 0.3s'
-};
-
-const featuresStyle = {
-  padding: '4rem 0',
-  backgroundColor: 'white'
-};
-
-const sectionContentStyle = {
-  maxWidth: '1200px',
-  margin: '0 auto',
-  padding: '0 2rem'
-};
-
-const sectionTitleStyle = {
-  fontSize: '2.5rem',
-  textAlign: 'center',
-  marginBottom: '3rem',
-  color: '#1e3a8a'
-};
-
-const featuresGridStyle = {
-  display: 'grid',
-  gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-  gap: '2rem'
-};
-
-const featureCardStyle = {
-  textAlign: 'center',
-  padding: '2rem',
-  borderRadius: '12px',
-  backgroundColor: '#f8fafc',
-  border: '1px solid #e2e8f0'
-};
-
-const featureIconStyle = {
-  fontSize: '3rem',
-  marginBottom: '1rem'
-};
-
-const featureHeadingStyle = {
-  fontSize: '1.5rem',
-  marginBottom: '1rem',
-  color: '#1e3a8a'
-};
-
-const featureTextStyle = {
-  color: '#64748b',
-  lineHeight: '1.6'
-};
-
-const plansPreviewStyle = {
-  padding: '4rem 0',
-  backgroundColor: '#f8fafc'
-};
-
-const plansGridStyle = {
-  display: 'grid',
-  gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-  gap: '2rem',
-  marginBottom: '3rem'
-};
-
-const planCardStyle = {
-  backgroundColor: 'white',
-  padding: '2rem',
-  borderRadius: '12px',
-  textAlign: 'center',
-  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-  border: '1px solid #e2e8f0'
-};
-
-const planNameStyle = {
-  fontSize: '1.5rem',
-  marginBottom: '1rem',
-  color: '#1e3a8a'
-};
-
-const planPriceStyle = {
-  fontSize: '2.5rem',
-  fontWeight: 'bold',
-  color: '#1e3a8a',
-  marginBottom: '1.5rem'
-};
-
-const planPeriodStyle = {
-  fontSize: '1rem',
-  fontWeight: 'normal',
-  color: '#64748b'
-};
-
-const planFeaturesStyle = {
-  listStyle: 'none',
-  padding: '0',
-  marginBottom: '2rem'
-};
-
-const planButtonStyle = {
-  backgroundColor: '#1e3a8a',
-  color: 'white',
-  padding: '0.75rem 2rem',
-  borderRadius: '8px',
-  textDecoration: 'none',
-  fontWeight: 'bold',
-  display: 'inline-block',
-  transition: 'background-color 0.3s'
-};
-
-const viewAllStyle = {
-  textAlign: 'center'
-};
-
-const viewAllButtonStyle = {
-  backgroundColor: 'transparent',
-  color: '#1e3a8a',
-  padding: '1rem 2rem',
-  border: '2px solid #1e3a8a',
-  borderRadius: '8px',
-  textDecoration: 'none',
-  fontWeight: 'bold',
-  fontSize: '1.1rem',
-  transition: 'all 0.3s'
 };
 
 export default Home;

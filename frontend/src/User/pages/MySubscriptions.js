@@ -27,17 +27,21 @@ const MySubscriptions = () => {
   ];
 
   useEffect(() => {
-    // Get user from localStorage
-    const userData = localStorage.getItem('user');
-    if (userData) {
-      setUser(JSON.parse(userData));
-    }
+    setLoading(true);
 
     // Simulate API call
     setTimeout(() => {
       setSubscriptions(mockSubscriptions);
       setLoading(false);
     }, 1000);
+  }, []);
+
+  useEffect(() => {
+    // Get user from localStorage
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      setUser(JSON.parse(userData));
+    }
   }, []);
 
   const formatDate = (dateString) => {

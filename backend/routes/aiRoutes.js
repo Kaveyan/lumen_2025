@@ -8,6 +8,7 @@ const aiController = new AIController();
 router.get('/health', (req, res) => aiController.healthCheck(req, res));
 
 // User recommendation endpoints
+router.post('/recommendations', (req, res) => aiController.getRecommendations(req, res));
 router.post('/users/:userId/recommendations', (req, res) => aiController.getRecommendations(req, res));
 router.post('/users/:userId/churn-prediction', (req, res) => aiController.predictChurn(req, res));
 router.post('/users/:userId/notifications', (req, res) => aiController.generateNotifications(req, res));

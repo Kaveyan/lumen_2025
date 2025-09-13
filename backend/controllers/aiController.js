@@ -11,24 +11,37 @@ class AIController {
             const { userId } = req.params;
             const userData = req.body;
 
-            // Validate required fields
-            if (!userData.currentPlan || !userData.monthlyUsage) {
-                return res.status(400).json({
-                    error: 'Missing required fields: currentPlan, monthlyUsage'
-                });
-            }
+            // Use default values if fields are missing (for demo purposes)
+            const requestData = {
+                userId: userId || userData.userId || 'demo-user',
+                currentPlan: userData.currentPlan || 'basic',
+                monthlyUsage: userData.monthlyUsage || userData.usageData || {
+                    averageDownload: 250,
+                    averageUpload: 50,
+                    peakUsage: 400,
+                    deviceCount: 8
+                },
+                preferences: userData.preferences || {
+                    budget: 'medium',
+                    priority: 'speed',
+                    familySize: 4
+                }
+            };
 
-            const recommendations = await this.aiService.generatePlanRecommendations(userData);
+            console.log('Processing recommendation request:', requestData);
+
+            const recommendations = await this.aiService.generatePlanRecommendations(requestData);
             
             res.json({
                 success: true,
-                userId,
+                userId: requestData.userId,
                 recommendations,
                 timestamp: new Date().toISOString()
             });
         } catch (error) {
             console.error('Error getting recommendations:', error);
             res.status(500).json({
+                success: false,
                 error: 'Failed to generate recommendations',
                 message: error.message
             });

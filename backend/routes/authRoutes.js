@@ -14,6 +14,24 @@ router.get('/profile', authenticateToken, (req, res) => authController.getProfil
 router.put('/profile', authenticateToken, (req, res) => authController.updateProfile(req, res));
 router.put('/change-password', authenticateToken, (req, res) => authController.changePassword(req, res));
 
+// Mock users for development
+const mockUsers = [
+  {
+    id: 1,
+    email: 'user@lumen.com',
+    password: 'user123',
+    name: 'Demo Customer',
+    role: 'user'
+  },
+  {
+    id: 2,
+    email: 'admin@lumen.com',
+    password: 'admin123',
+    name: 'Admin User',
+    role: 'admin'
+  }
+];
+
 // Admin routes
 router.get('/users', authenticateToken, requireAdmin, (req, res) => authController.getAllUsers(req, res));
 router.put('/users/role', authenticateToken, requireAdmin, (req, res) => authController.updateUserRole(req, res));

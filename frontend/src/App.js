@@ -5,9 +5,13 @@ import { CssBaseline } from '@mui/material';
 import theme from './theme';
 import './App.css';
 
+// Import contexts
+import { AuthProvider } from './contexts/AuthContext';
+
 // Import components
 import Navbar from './User/components/Navbar';
 import Footer from './User/components/Footer';
+import ProtectedRoute from './components/ProtectedRoute';
 
 // Import pages
 import Home from './User/pages/Home';
@@ -23,34 +27,83 @@ import Discounts from './User/pages/Discounts';
 import Recommendations from './User/pages/Recommendations';
 import Dashboard from './User/pages/Dashboard';
 import AdminDashboard from './admin/pages/AdminDashboard';
+import AdminRecommendations from './admin/pages/AdminRecommendations';
 
 function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Router>
-        <div className="App">
-          <Navbar />
-          <main className="main-content">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/plans" element={<Plans />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/my-subscriptions" element={<MySubscriptions />} />
-              <Route path="/plan-details/:planId" element={<PlanDetails />} />
-              <Route path="/upgrade-downgrade" element={<UpgradeDowngrade />} />
-              <Route path="/cancel-renew" element={<CancelRenew />} />
-              <Route path="/discounts" element={<Discounts />} />
-              <Route path="/recommendations" element={<Recommendations />} />
-              <Route path="/admin/dashboard" element={<AdminDashboard />} />
-            </Routes>
-          </main>
-          <Footer />
-        </div>
-      </Router>
+      <AuthProvider>
+        <Router>
+          <div className="App">
+            <Navbar />
+            <main className="main-content">
+              <Routes>
+                {/* Public routes */}
+                <Route path="/" element={<Home />} />
+                <Route path="/plans" element={<Plans />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                
+                {/* Protected routes */}
+                <Route path="/profile" element={
+                  <ProtectedRoute>
+                    <Profile />
+                  </ProtectedRoute>
+                } />
+                <Route path="/dashboard" element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                } />
+                <Route path="/my-subscriptions" element={
+                  <ProtectedRoute>
+                    <MySubscriptions />
+                  </ProtectedRoute>
+                } />
+                <Route path="/plan-details/:planId" element={
+                  <ProtectedRoute>
+                    <PlanDetails />
+                  </ProtectedRoute>
+                } />
+                <Route path="/upgrade-downgrade" element={
+                  <ProtectedRoute>
+                    <UpgradeDowngrade />
+                  </ProtectedRoute>
+                } />
+                <Route path="/cancel-renew" element={
+                  <ProtectedRoute>
+                    <CancelRenew />
+                  </ProtectedRoute>
+                } />
+                <Route path="/discounts" element={
+                  <ProtectedRoute>
+                    <Discounts />
+                  </ProtectedRoute>
+                } />
+                <Route path="/recommendations" element={
+                  <ProtectedRoute>
+                    <Recommendations />
+                  </ProtectedRoute>
+                } />
+                
+                {/* Admin only routes */}
+                <Route path="/admin/dashboard" element={
+                  <ProtectedRoute adminOnly={true}>
+                    <AdminDashboard />
+                  </ProtectedRoute>
+                } />
+                <Route path="/admin/recommendations" element={
+                  <ProtectedRoute adminOnly={true}>
+                    <AdminRecommendations />
+                  </ProtectedRoute>
+                } />
+              </Routes>
+            </main>
+            <Footer />
+          </div>
+        </Router>
+      </AuthProvider>
     </ThemeProvider>
   );
 }

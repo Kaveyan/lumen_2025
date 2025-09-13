@@ -1,5 +1,38 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import {
+  Container,
+  Grid,
+  Card,
+  CardContent,
+  Typography,
+  Box,
+  Button,
+  Avatar,
+  Chip,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  LinearProgress,
+  FormControl,
+  Select,
+  MenuItem
+} from '@mui/material';
+import {
+  People,
+  TrendingUp,
+  AttachMoney,
+  Psychology,
+  Analytics,
+  Settings,
+  Support,
+  AdminPanelSettings,
+  ExitToApp
+} from '@mui/icons-material';
 
 const AdminDashboard = () => {
     const [user, setUser] = useState(null);
@@ -100,9 +133,16 @@ const AdminDashboard = () => {
 
     if (loading) {
         return (
-            <div style={loadingStyle}>
-                <div>Loading Admin Dashboard...</div>
-            </div>
+            <Container maxWidth="xl" sx={{ py: 4 }}>
+                <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
+                    <Box textAlign="center">
+                        <LinearProgress sx={{ mb: 2, width: 200 }} />
+                        <Typography variant="h6" color="text.secondary">
+                            Loading Admin Dashboard...
+                        </Typography>
+                    </Box>
+                </Box>
+            </Container>
         );
     }
 
@@ -111,419 +151,333 @@ const AdminDashboard = () => {
     }
 
     return (
-        <div style={containerStyle}>
-            <div style={headerStyle}>
-                <div style={headerContentStyle}>
-                    <div>
-                        <h1 style={titleStyle}>Admin Dashboard</h1>
-                        <p style={subtitleStyle}>Welcome, {user.firstName}! Manage your broadband service platform</p>
-                    </div>
-                    <button onClick={handleLogout} style={logoutButtonStyle}>
-                        Logout
-                    </button>
-                </div>
-            </div>
+        <Container maxWidth="xl" sx={{ py: 4 }}>
+            {/* Header */}
+            <Paper elevation={2} sx={{ p: 3, mb: 4, background: 'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)' }}>
+                <Box display="flex" justifyContent="space-between" alignItems="center">
+                    <Box>
+                        <Typography variant="h3" sx={{ color: 'white', fontWeight: 700, mb: 1 }}>
+                            Admin Dashboard
+                        </Typography>
+                        <Typography variant="h6" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                            Welcome, {user.firstName}! Manage your broadband service platform
+                        </Typography>
+                    </Box>
+                    <Box display="flex" alignItems="center" gap={2}>
+                        <Chip
+                            icon={<AdminPanelSettings />}
+                            label="Administrator"
+                            sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: 'white' }}
+                        />
+                        <Button
+                            variant="contained"
+                            color="error"
+                            startIcon={<ExitToApp />}
+                            onClick={handleLogout}
+                            sx={{ bgcolor: 'rgba(239, 68, 68, 0.9)' }}
+                        >
+                            Logout
+                        </Button>
+                    </Box>
+                </Box>
+            </Paper>
 
             {/* Key Metrics */}
-            <div style={metricsGridStyle}>
-                <div style={metricCardStyle}>
-                    <div style={metricIconStyle}>👥</div>
-                    <div style={metricValueStyle}>{stats.totalUsers}</div>
-                    <div style={metricLabelStyle}>Total Users</div>
-                </div>
+            <Grid container spacing={3} sx={{ mb: 4 }}>
+                <Grid item xs={12} sm={6} md={3}>
+                    <Card elevation={3} sx={{ height: '100%', background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)' }}>
+                        <CardContent sx={{ textAlign: 'center', py: 3 }}>
+                            <People sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
+                            <Typography variant="h3" sx={{ fontWeight: 700, color: 'primary.main', mb: 1 }}>
+                                {stats.totalUsers}
+                            </Typography>
+                            <Typography variant="h6" color="text.secondary">
+                                Total Users
+                            </Typography>
+                        </CardContent>
+                    </Card>
+                </Grid>
 
-                <div style={metricCardStyle}>
-                    <div style={metricIconStyle}>✅</div>
-                    <div style={metricValueStyle}>{stats.activeSubscriptions}</div>
-                    <div style={metricLabelStyle}>Active Subscriptions</div>
-                </div>
+                <Grid item xs={12} sm={6} md={3}>
+                    <Card elevation={3} sx={{ height: '100%', background: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)' }}>
+                        <CardContent sx={{ textAlign: 'center', py: 3 }}>
+                            <TrendingUp sx={{ fontSize: 48, color: 'success.main', mb: 2 }} />
+                            <Typography variant="h3" sx={{ fontWeight: 700, color: 'success.main', mb: 1 }}>
+                                {stats.activeSubscriptions}
+                            </Typography>
+                            <Typography variant="h6" color="text.secondary">
+                                Active Subscriptions
+                            </Typography>
+                        </CardContent>
+                    </Card>
+                </Grid>
 
-                <div style={metricCardStyle}>
-                    <div style={metricIconStyle}>💰</div>
-                    <div style={metricValueStyle}>${stats.totalRevenue.toLocaleString()}</div>
-                    <div style={metricLabelStyle}>Monthly Revenue</div>
-                </div>
+                <Grid item xs={12} sm={6} md={3}>
+                    <Card elevation={3} sx={{ height: '100%', background: 'linear-gradient(135deg, #fefce8 0%, #fef3c7 100%)' }}>
+                        <CardContent sx={{ textAlign: 'center', py: 3 }}>
+                            <AttachMoney sx={{ fontSize: 48, color: 'warning.main', mb: 2 }} />
+                            <Typography variant="h3" sx={{ fontWeight: 700, color: 'warning.main', mb: 1 }}>
+                                ${stats.totalRevenue.toLocaleString()}
+                            </Typography>
+                            <Typography variant="h6" color="text.secondary">
+                                Monthly Revenue
+                            </Typography>
+                        </CardContent>
+                    </Card>
+                </Grid>
 
-                <div style={metricCardStyle}>
-                    <div style={metricIconStyle}>📉</div>
-                    <div style={metricValueStyle}>{stats.churnRate}%</div>
-                    <div style={metricLabelStyle}>Churn Rate</div>
-                </div>
-            </div>
+                <Grid item xs={12} sm={6} md={3}>
+                    <Card elevation={3} sx={{ height: '100%', background: 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)' }}>
+                        <CardContent sx={{ textAlign: 'center', py: 3 }}>
+                            <Psychology sx={{ fontSize: 48, color: 'error.main', mb: 2 }} />
+                            <Typography variant="h3" sx={{ fontWeight: 700, color: 'error.main', mb: 1 }}>
+                                {stats.churnRate}%
+                            </Typography>
+                            <Typography variant="h6" color="text.secondary">
+                                Churn Rate
+                            </Typography>
+                        </CardContent>
+                    </Card>
+                </Grid>
+            </Grid>
 
             {/* Quick Actions */}
-            <div style={actionsGridStyle}>
-                <div style={actionCardStyle} onClick={() => navigate('/admin/analytics')}>
-                    <div style={actionIconStyle}>📊</div>
-                    <h3 style={actionTitleStyle}>Analytics & Reports</h3>
-                    <p style={actionDescStyle}>View detailed usage and revenue analytics</p>
-                </div>
+            <Grid container spacing={3} sx={{ mb: 4 }}>
+                <Grid item xs={12} sm={6} md={3}>
+                    <Card 
+                        elevation={2} 
+                        sx={{ 
+                            height: '100%', 
+                            cursor: 'pointer',
+                            transition: 'all 0.3s',
+                            '&:hover': { 
+                                transform: 'translateY(-4px)', 
+                                boxShadow: 6 
+                            }
+                        }}
+                        onClick={() => navigate('/admin/analytics')}
+                    >
+                        <CardContent sx={{ textAlign: 'center', py: 3 }}>
+                            <Analytics sx={{ fontSize: 40, color: 'primary.main', mb: 2 }} />
+                            <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
+                                Analytics & Reports
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                                View detailed usage and revenue analytics
+                            </Typography>
+                        </CardContent>
+                    </Card>
+                </Grid>
 
-                <div style={actionCardStyle} onClick={() => navigate('/admin/plans')}>
-                    <div style={actionIconStyle}>📋</div>
-                    <h3 style={actionTitleStyle}>Manage Plans</h3>
-                    <p style={actionDescStyle}>Create and modify subscription plans</p>
-                </div>
+                <Grid item xs={12} sm={6} md={3}>
+                    <Card 
+                        elevation={2} 
+                        sx={{ 
+                            height: '100%', 
+                            cursor: 'pointer',
+                            transition: 'all 0.3s',
+                            '&:hover': { 
+                                transform: 'translateY(-4px)', 
+                                boxShadow: 6 
+                            }
+                        }}
+                        onClick={() => navigate('/admin/plans')}
+                    >
+                        <CardContent sx={{ textAlign: 'center', py: 3 }}>
+                            <Settings sx={{ fontSize: 40, color: 'secondary.main', mb: 2 }} />
+                            <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
+                                Manage Plans
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                                Create and modify subscription plans
+                            </Typography>
+                        </CardContent>
+                    </Card>
+                </Grid>
 
-                <div style={actionCardStyle} onClick={() => navigate('/admin/ai-insights')}>
-                    <div style={actionIconStyle}>🤖</div>
-                    <h3 style={actionTitleStyle}>AI Insights</h3>
-                    <p style={actionDescStyle}>AI-powered business intelligence</p>
-                </div>
+                <Grid item xs={12} sm={6} md={3}>
+                    <Card 
+                        elevation={2} 
+                        sx={{ 
+                            height: '100%', 
+                            cursor: 'pointer',
+                            transition: 'all 0.3s',
+                            '&:hover': { 
+                                transform: 'translateY(-4px)', 
+                                boxShadow: 6 
+                            }
+                        }}
+                        onClick={() => navigate('/admin/ai-insights')}
+                    >
+                        <CardContent sx={{ textAlign: 'center', py: 3 }}>
+                            <Psychology sx={{ fontSize: 40, color: 'success.main', mb: 2 }} />
+                            <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
+                                AI Insights
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                                AI-powered business intelligence
+                            </Typography>
+                        </CardContent>
+                    </Card>
+                </Grid>
 
-                <div style={actionCardStyle} onClick={() => navigate('/admin/support')}>
-                    <div style={actionIconStyle}>🎧</div>
-                    <h3 style={actionTitleStyle}>Customer Support</h3>
-                    <p style={actionDescStyle}>Manage customer inquiries and tickets</p>
-                </div>
-            </div>
+                <Grid item xs={12} sm={6} md={3}>
+                    <Card 
+                        elevation={2} 
+                        sx={{ 
+                            height: '100%', 
+                            cursor: 'pointer',
+                            transition: 'all 0.3s',
+                            '&:hover': { 
+                                transform: 'translateY(-4px)', 
+                                boxShadow: 6 
+                            }
+                        }}
+                        onClick={() => navigate('/admin/support')}
+                    >
+                        <CardContent sx={{ textAlign: 'center', py: 3 }}>
+                            <Support sx={{ fontSize: 40, color: 'warning.main', mb: 2 }} />
+                            <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
+                                Customer Support
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                                Manage customer inquiries and tickets
+                            </Typography>
+                        </CardContent>
+                    </Card>
+                </Grid>
+            </Grid>
 
             {/* User Management */}
-            <div style={userManagementStyle}>
-                <h2 style={sectionTitleStyle}>User Management</h2>
-                <div style={userTableStyle}>
-                    <div style={tableHeaderStyle}>
-                        <div style={tableHeaderCellStyle}>Name</div>
-                        <div style={tableHeaderCellStyle}>Email</div>
-                        <div style={tableHeaderCellStyle}>Role</div>
-                        <div style={tableHeaderCellStyle}>Status</div>
-                        <div style={tableHeaderCellStyle}>Plan</div>
-                        <div style={tableHeaderCellStyle}>Actions</div>
-                    </div>
-                    
-                    {users.slice(0, 10).map((userData) => (
-                        <div key={userData.id} style={tableRowStyle}>
-                            <div style={tableCellStyle}>
-                                {userData.firstName} {userData.lastName}
-                            </div>
-                            <div style={tableCellStyle}>{userData.email}</div>
-                            <div style={tableCellStyle}>
-                                <span style={userData.role === 'admin' ? adminBadgeStyle : userBadgeStyle}>
-                                    {userData.role}
-                                </span>
-                            </div>
-                            <div style={tableCellStyle}>
-                                <span style={userData.subscriptionStatus === 'active' ? activeBadgeStyle : inactiveBadgeStyle}>
-                                    {userData.subscriptionStatus || 'inactive'}
-                                </span>
-                            </div>
-                            <div style={tableCellStyle}>{userData.currentPlan || 'None'}</div>
-                            <div style={tableCellStyle}>
-                                <select
-                                    value={userData.role}
-                                    onChange={(e) => updateUserRole(userData.id, e.target.value)}
-                                    style={selectStyle}
-                                >
-                                    <option value="user">User</option>
-                                    <option value="admin">Admin</option>
-                                </select>
-                            </div>
-                        </div>
-                    ))}
-                </div>
+            <Paper elevation={3} sx={{ p: 3, mb: 4 }}>
+                <Typography variant="h5" sx={{ fontWeight: 600, mb: 3, color: 'primary.main' }}>
+                    User Management
+                </Typography>
+                <TableContainer>
+                    <Table>
+                        <TableHead>
+                            <TableRow sx={{ bgcolor: 'grey.50' }}>
+                                <TableCell sx={{ fontWeight: 600 }}>User</TableCell>
+                                <TableCell sx={{ fontWeight: 600 }}>Email</TableCell>
+                                <TableCell sx={{ fontWeight: 600 }}>Role</TableCell>
+                                <TableCell sx={{ fontWeight: 600 }}>Status</TableCell>
+                                <TableCell sx={{ fontWeight: 600 }}>Plan</TableCell>
+                                <TableCell sx={{ fontWeight: 600 }}>Actions</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {users.slice(0, 10).map((userData) => (
+                                <TableRow key={userData.id} hover>
+                                    <TableCell>
+                                        <Box display="flex" alignItems="center" gap={2}>
+                                            <Avatar sx={{ bgcolor: 'primary.main', width: 32, height: 32 }}>
+                                                {userData.firstName?.charAt(0) || userData.email?.charAt(0)}
+                                            </Avatar>
+                                            <Box>
+                                                <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                                                    {userData.firstName} {userData.lastName}
+                                                </Typography>
+                                            </Box>
+                                        </Box>
+                                    </TableCell>
+                                    <TableCell>{userData.email}</TableCell>
+                                    <TableCell>
+                                        <Chip
+                                            label={userData.role}
+                                            color={userData.role === 'admin' ? 'secondary' : 'primary'}
+                                            size="small"
+                                            variant="outlined"
+                                        />
+                                    </TableCell>
+                                    <TableCell>
+                                        <Chip
+                                            label={userData.subscriptionStatus || 'inactive'}
+                                            color={userData.subscriptionStatus === 'active' ? 'success' : 'default'}
+                                            size="small"
+                                        />
+                                    </TableCell>
+                                    <TableCell>{userData.currentPlan || 'None'}</TableCell>
+                                    <TableCell>
+                                        <FormControl size="small" sx={{ minWidth: 100 }}>
+                                            <Select
+                                                value={userData.role}
+                                                onChange={(e) => updateUserRole(userData.id, e.target.value)}
+                                            >
+                                                <MenuItem value="user">User</MenuItem>
+                                                <MenuItem value="admin">Admin</MenuItem>
+                                            </Select>
+                                        </FormControl>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
                 
                 {users.length > 10 && (
-                    <div style={showMoreStyle}>
-                        <button style={showMoreButtonStyle}>
+                    <Box textAlign="center" mt={3}>
+                        <Button variant="outlined" size="large">
                             Show All {users.length} Users
-                        </button>
-                    </div>
+                        </Button>
+                    </Box>
                 )}
-            </div>
+            </Paper>
 
             {/* Recent Activity */}
-            <div style={recentActivityStyle}>
-                <h2 style={sectionTitleStyle}>Recent System Activity</h2>
-                <div style={activityListStyle}>
-                    <div style={activityItemStyle}>
-                        <div style={activityIconStyle}>👤</div>
-                        <div>
-                            <div style={activityTitleStyle}>New User Registration</div>
-                            <div style={activityTimeStyle}>Latest user joined the platform</div>
-                        </div>
-                    </div>
-                    <div style={activityItemStyle}>
-                        <div style={activityIconStyle}>🤖</div>
-                        <div>
-                            <div style={activityTitleStyle}>AI Recommendations Generated</div>
-                            <div style={activityTimeStyle}>AI system processed user recommendations</div>
-                        </div>
-                    </div>
-                    <div style={activityItemStyle}>
-                        <div style={activityIconStyle}>💳</div>
-                        <div>
-                            <div style={activityTitleStyle}>Subscription Updates</div>
-                            <div style={activityTimeStyle}>Users updated their subscription plans</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+            <Paper elevation={3} sx={{ p: 3 }}>
+                <Typography variant="h5" sx={{ fontWeight: 600, mb: 3, color: 'primary.main' }}>
+                    Recent System Activity
+                </Typography>
+                <Grid container spacing={2}>
+                    <Grid item xs={12} md={4}>
+                        <Card sx={{ p: 2, bgcolor: 'primary.50', border: '1px solid', borderColor: 'primary.200' }}>
+                            <Box display="flex" alignItems="center" gap={2}>
+                                <People sx={{ color: 'primary.main' }} />
+                                <Box>
+                                    <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                                        New User Registration
+                                    </Typography>
+                                    <Typography variant="body2" color="text.secondary">
+                                        Latest user joined the platform
+                                    </Typography>
+                                </Box>
+                            </Box>
+                        </Card>
+                    </Grid>
+                    <Grid item xs={12} md={4}>
+                        <Card sx={{ p: 2, bgcolor: 'secondary.50', border: '1px solid', borderColor: 'secondary.200' }}>
+                            <Box display="flex" alignItems="center" gap={2}>
+                                <Psychology sx={{ color: 'secondary.main' }} />
+                                <Box>
+                                    <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                                        AI Recommendations Generated
+                                    </Typography>
+                                    <Typography variant="body2" color="text.secondary">
+                                        AI system processed user recommendations
+                                    </Typography>
+                                </Box>
+                            </Box>
+                        </Card>
+                    </Grid>
+                    <Grid item xs={12} md={4}>
+                        <Card sx={{ p: 2, bgcolor: 'success.50', border: '1px solid', borderColor: 'success.200' }}>
+                            <Box display="flex" alignItems="center" gap={2}>
+                                <AttachMoney sx={{ color: 'success.main' }} />
+                                <Box>
+                                    <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                                        Subscription Updates
+                                    </Typography>
+                                    <Typography variant="body2" color="text.secondary">
+                                        Users updated their subscription plans
+                                    </Typography>
+                                </Box>
+                            </Box>
+                        </Card>
+                    </Grid>
+                </Grid>
+            </Paper>
+        </Container>
     );
-};
-
-// Styles
-const containerStyle = {
-    minHeight: '100vh',
-    backgroundColor: '#f1f5f9',
-    padding: '2rem'
-};
-
-const loadingStyle = {
-    minHeight: '100vh',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: '1.2rem',
-    color: '#64748b'
-};
-
-const headerStyle = {
-    backgroundColor: 'white',
-    borderRadius: '12px',
-    padding: '2rem',
-    marginBottom: '2rem',
-    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)'
-};
-
-const headerContentStyle = {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center'
-};
-
-const titleStyle = {
-    fontSize: '2.5rem',
-    fontWeight: 'bold',
-    color: '#1e3a8a',
-    marginBottom: '0.5rem'
-};
-
-const subtitleStyle = {
-    color: '#64748b',
-    fontSize: '1.1rem'
-};
-
-const logoutButtonStyle = {
-    backgroundColor: '#ef4444',
-    color: 'white',
-    border: 'none',
-    padding: '0.75rem 1.5rem',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    fontSize: '1rem',
-    fontWeight: '500'
-};
-
-const metricsGridStyle = {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-    gap: '1.5rem',
-    marginBottom: '2rem'
-};
-
-const metricCardStyle = {
-    backgroundColor: 'white',
-    padding: '2rem',
-    borderRadius: '12px',
-    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)',
-    textAlign: 'center'
-};
-
-const metricIconStyle = {
-    fontSize: '3rem',
-    marginBottom: '1rem'
-};
-
-const metricValueStyle = {
-    fontSize: '2.5rem',
-    fontWeight: 'bold',
-    color: '#1e3a8a',
-    marginBottom: '0.5rem'
-};
-
-const metricLabelStyle = {
-    color: '#64748b',
-    fontSize: '1rem',
-    fontWeight: '500'
-};
-
-const actionsGridStyle = {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-    gap: '1.5rem',
-    marginBottom: '2rem'
-};
-
-const actionCardStyle = {
-    backgroundColor: 'white',
-    padding: '1.5rem',
-    borderRadius: '12px',
-    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)',
-    cursor: 'pointer',
-    transition: 'transform 0.2s, box-shadow 0.2s',
-    textAlign: 'center'
-};
-
-const actionIconStyle = {
-    fontSize: '2.5rem',
-    marginBottom: '1rem'
-};
-
-const actionTitleStyle = {
-    fontSize: '1.25rem',
-    fontWeight: 'bold',
-    color: '#1e3a8a',
-    marginBottom: '0.5rem'
-};
-
-const actionDescStyle = {
-    color: '#64748b',
-    fontSize: '0.95rem'
-};
-
-const userManagementStyle = {
-    backgroundColor: 'white',
-    padding: '2rem',
-    borderRadius: '12px',
-    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)',
-    marginBottom: '2rem'
-};
-
-const sectionTitleStyle = {
-    fontSize: '1.5rem',
-    fontWeight: 'bold',
-    color: '#1e3a8a',
-    marginBottom: '1.5rem'
-};
-
-const userTableStyle = {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '0.5rem'
-};
-
-const tableHeaderStyle = {
-    display: 'grid',
-    gridTemplateColumns: '1fr 1fr 0.8fr 0.8fr 1fr 1fr',
-    gap: '1rem',
-    padding: '1rem',
-    backgroundColor: '#f8fafc',
-    borderRadius: '8px',
-    fontWeight: 'bold',
-    color: '#374151'
-};
-
-const tableHeaderCellStyle = {
-    fontSize: '0.875rem'
-};
-
-const tableRowStyle = {
-    display: 'grid',
-    gridTemplateColumns: '1fr 1fr 0.8fr 0.8fr 1fr 1fr',
-    gap: '1rem',
-    padding: '1rem',
-    borderBottom: '1px solid #e5e7eb',
-    alignItems: 'center'
-};
-
-const tableCellStyle = {
-    fontSize: '0.875rem',
-    color: '#374151'
-};
-
-const adminBadgeStyle = {
-    backgroundColor: '#fef3c7',
-    color: '#d97706',
-    padding: '0.25rem 0.75rem',
-    borderRadius: '9999px',
-    fontSize: '0.75rem',
-    fontWeight: '500'
-};
-
-const userBadgeStyle = {
-    backgroundColor: '#dbeafe',
-    color: '#2563eb',
-    padding: '0.25rem 0.75rem',
-    borderRadius: '9999px',
-    fontSize: '0.75rem',
-    fontWeight: '500'
-};
-
-const activeBadgeStyle = {
-    backgroundColor: '#dcfce7',
-    color: '#16a34a',
-    padding: '0.25rem 0.75rem',
-    borderRadius: '9999px',
-    fontSize: '0.75rem',
-    fontWeight: '500'
-};
-
-const inactiveBadgeStyle = {
-    backgroundColor: '#fee2e2',
-    color: '#dc2626',
-    padding: '0.25rem 0.75rem',
-    borderRadius: '9999px',
-    fontSize: '0.75rem',
-    fontWeight: '500'
-};
-
-const selectStyle = {
-    padding: '0.5rem',
-    border: '1px solid #d1d5db',
-    borderRadius: '6px',
-    fontSize: '0.875rem'
-};
-
-const showMoreStyle = {
-    textAlign: 'center',
-    marginTop: '1rem'
-};
-
-const showMoreButtonStyle = {
-    backgroundColor: '#3b82f6',
-    color: 'white',
-    border: 'none',
-    padding: '0.75rem 1.5rem',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    fontSize: '0.875rem'
-};
-
-const recentActivityStyle = {
-    backgroundColor: 'white',
-    padding: '2rem',
-    borderRadius: '12px',
-    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)'
-};
-
-const activityListStyle = {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '1rem'
-};
-
-const activityItemStyle = {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '1rem',
-    padding: '1rem',
-    backgroundColor: '#f8fafc',
-    borderRadius: '8px'
-};
-
-const activityIconStyle = {
-    fontSize: '1.5rem'
-};
-
-const activityTitleStyle = {
-    fontWeight: '500',
-    color: '#374151'
-};
-
-const activityTimeStyle = {
-    fontSize: '0.875rem',
-    color: '#64748b'
 };
 
 export default AdminDashboard;

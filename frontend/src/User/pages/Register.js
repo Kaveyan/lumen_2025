@@ -13,6 +13,7 @@ const Register = () => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -100,6 +101,12 @@ const Register = () => {
           {error && (
             <div style={errorStyle}>
               {error}
+            </div>
+          )}
+          
+          {success && (
+            <div style={successStyle}>
+              {success}
             </div>
           )}
 
@@ -264,6 +271,16 @@ const errorStyle = {
   backgroundColor: '#fef2f2',
   border: '1px solid #fecaca',
   color: '#dc2626',
+  padding: '0.75rem',
+  borderRadius: '8px',
+  marginBottom: '1rem',
+  fontSize: '0.875rem'
+};
+
+const successStyle = {
+  backgroundColor: '#f0fdf4',
+  border: '1px solid #bbf7d0',
+  color: '#166534',
   padding: '0.75rem',
   borderRadius: '8px',
   marginBottom: '1rem',

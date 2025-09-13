@@ -1,5 +1,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { ThemeProvider } from '@mui/material/styles';
+import { CssBaseline } from '@mui/material';
+import theme from './theme';
 import './App.css';
 
 // Import components
@@ -23,29 +26,32 @@ import AdminDashboard from './admin/pages/AdminDashboard';
 
 function App() {
   return (
-    <Router>
-      <div className="App">
-        <Navbar />
-        <main className="main-content">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/plans" element={<Plans />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/my-subscriptions" element={<MySubscriptions />} />
-            <Route path="/plan-details/:planId" element={<PlanDetails />} />
-            <Route path="/upgrade-downgrade" element={<UpgradeDowngrade />} />
-            <Route path="/cancel-renew" element={<CancelRenew />} />
-            <Route path="/discounts" element={<Discounts />} />
-            <Route path="/recommendations" element={<Recommendations />} />
-            <Route path="/admin/dashboard" element={<AdminDashboard />} />
-          </Routes>
-        </main>
-        <Footer />
-      </div>
-    </Router>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <Router>
+        <div className="App">
+          <Navbar />
+          <main className="main-content">
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/plans" element={<Plans />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/my-subscriptions" element={<MySubscriptions />} />
+              <Route path="/plan-details/:planId" element={<PlanDetails />} />
+              <Route path="/upgrade-downgrade" element={<UpgradeDowngrade />} />
+              <Route path="/cancel-renew" element={<CancelRenew />} />
+              <Route path="/discounts" element={<Discounts />} />
+              <Route path="/recommendations" element={<Recommendations />} />
+              <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            </Routes>
+          </main>
+          <Footer />
+        </div>
+      </Router>
+    </ThemeProvider>
   );
 }
 

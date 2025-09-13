@@ -1,5 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import {
+  Container,
+  Grid,
+  Card,
+  CardContent,
+  Typography,
+  Box,
+  Button,
+  Avatar,
+  Paper,
+  LinearProgress
+} from '@mui/material';
+import {
+  Subscriptions,
+  Psychology,
+  ViewList,
+  AccountCircle,
+  LocalOffer,
+  TrendingUp,
+  ExitToApp,
+  Person,
+  Speed,
+  Devices,
+  CheckCircle,
+  Security,
+  Settings,
+  Upgrade,
+  DataUsage
+} from '@mui/icons-material';
 
 const Dashboard = () => {
     const [user, setUser] = useState(null);
@@ -43,9 +72,16 @@ const Dashboard = () => {
 
     if (loading) {
         return (
-            <div style={loadingStyle}>
-                <div>Loading...</div>
-            </div>
+            <Container maxWidth="xl" sx={{ py: 4 }}>
+                <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
+                    <Box textAlign="center">
+                        <LinearProgress sx={{ mb: 2, width: 200 }} />
+                        <Typography variant="h6" color="text.secondary">
+                            Loading Dashboard...
+                        </Typography>
+                    </Box>
+                </Box>
+            </Container>
         );
     }
 
@@ -54,270 +90,293 @@ const Dashboard = () => {
     }
 
     return (
-        <div style={containerStyle}>
-            <div style={headerStyle}>
-                <div style={headerContentStyle}>
-                    <div>
-                        <h1 style={titleStyle}>Welcome back, {user.firstName}!</h1>
-                        <p style={subtitleStyle}>Manage your broadband services and explore AI-powered recommendations</p>
-                    </div>
-                    <button onClick={handleLogout} style={logoutButtonStyle}>
+        <Container maxWidth="xl" sx={{ py: 4 }}>
+            {/* Header */}
+            <Paper elevation={2} sx={{ p: 3, mb: 4, background: 'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)' }}>
+                <Box display="flex" justifyContent="space-between" alignItems="center">
+                    <Box display="flex" alignItems="center" gap={3}>
+                        <Avatar sx={{ bgcolor: 'rgba(255,255,255,0.2)', width: 64, height: 64, fontSize: '1.5rem' }}>
+                            {user.firstName?.charAt(0) || user.email?.charAt(0)}
+                        </Avatar>
+                        <Box>
+                            <Typography variant="h3" sx={{ color: 'white', fontWeight: 700, mb: 1 }}>
+                                Welcome back, {user.firstName}!
+                            </Typography>
+                            <Typography variant="h6" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                                Manage your broadband services and explore AI-powered recommendations
+                            </Typography>
+                        </Box>
+                    </Box>
+                    <Button
+                        variant="contained"
+                        color="error"
+                        startIcon={<ExitToApp />}
+                        onClick={handleLogout}
+                        sx={{ bgcolor: 'rgba(239, 68, 68, 0.9)' }}
+                    >
                         Logout
-                    </button>
-                </div>
-            </div>
+                    </Button>
+                </Box>
+            </Paper>
 
-            <div style={dashboardGridStyle}>
-                {/* Quick Stats */}
-                <div style={cardStyle}>
-                    <h3 style={cardTitleStyle}>Current Plan</h3>
-                    <div style={statValueStyle}>{user.currentPlan || 'No Active Plan'}</div>
-                    <p style={cardDescStyle}>Your current subscription</p>
-                </div>
+            {/* Quick Stats */}
+            <Grid container spacing={3} sx={{ mb: 4 }}>
+                <Grid item xs={12} sm={6} md={3}>
+                    <Card elevation={3} sx={{ height: '100%', background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)' }}>
+                        <CardContent sx={{ textAlign: 'center', py: 3 }}>
+                            <Subscriptions sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
+                            <Typography variant="h4" sx={{ fontWeight: 700, color: 'primary.main', mb: 1 }}>
+                                {user.currentPlan || 'No Plan'}
+                            </Typography>
+                            <Typography variant="h6" color="text.secondary">
+                                Current Plan
+                            </Typography>
+                        </CardContent>
+                    </Card>
+                </Grid>
 
-                <div style={cardStyle}>
-                    <h3 style={cardTitleStyle}>Account Status</h3>
-                    <div style={statValueStyle}>{user.subscriptionStatus || 'Active'}</div>
-                    <p style={cardDescStyle}>Service status</p>
-                </div>
+                <Grid item xs={12} sm={6} md={3}>
+                    <Card elevation={3} sx={{ height: '100%', background: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)' }}>
+                        <CardContent sx={{ textAlign: 'center', py: 3 }}>
+                            <CheckCircle sx={{ fontSize: 48, color: 'success.main', mb: 2 }} />
+                            <Typography variant="h4" sx={{ fontWeight: 700, color: 'success.main', mb: 1 }}>
+                                {user.subscriptionStatus || 'Active'}
+                            </Typography>
+                            <Typography variant="h6" color="text.secondary">
+                                Account Status
+                            </Typography>
+                        </CardContent>
+                    </Card>
+                </Grid>
 
-                <div style={cardStyle}>
-                    <h3 style={cardTitleStyle}>Data Usage</h3>
-                    <div style={statValueStyle}>{user.usageData?.averageDownload || 250} GB</div>
-                    <p style={cardDescStyle}>Monthly average</p>
-                </div>
+                <Grid item xs={12} sm={6} md={3}>
+                    <Card elevation={3} sx={{ height: '100%', background: 'linear-gradient(135deg, #fefce8 0%, #fef3c7 100%)' }}>
+                        <CardContent sx={{ textAlign: 'center', py: 3 }}>
+                            <DataUsage sx={{ fontSize: 48, color: 'warning.main', mb: 2 }} />
+                            <Typography variant="h4" sx={{ fontWeight: 700, color: 'warning.main', mb: 1 }}>
+                                {user.usageData?.averageDownload || 250} GB
+                            </Typography>
+                            <Typography variant="h6" color="text.secondary">
+                                Monthly Usage
+                            </Typography>
+                        </CardContent>
+                    </Card>
+                </Grid>
 
-                <div style={cardStyle}>
-                    <h3 style={cardTitleStyle}>Connected Devices</h3>
-                    <div style={statValueStyle}>{user.usageData?.deviceCount || 8}</div>
-                    <p style={cardDescStyle}>Active connections</p>
-                </div>
-            </div>
+                <Grid item xs={12} sm={6} md={3}>
+                    <Card elevation={3} sx={{ height: '100%', background: 'linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%)' }}>
+                        <CardContent sx={{ textAlign: 'center', py: 3 }}>
+                            <Devices sx={{ fontSize: 48, color: 'secondary.main', mb: 2 }} />
+                            <Typography variant="h4" sx={{ fontWeight: 700, color: 'secondary.main', mb: 1 }}>
+                                {user.usageData?.deviceCount || 8}
+                            </Typography>
+                            <Typography variant="h6" color="text.secondary">
+                                Connected Devices
+                            </Typography>
+                        </CardContent>
+                    </Card>
+                </Grid>
+            </Grid>
 
-            <div style={actionGridStyle}>
-                {/* Quick Actions */}
-                <div style={actionCardStyle} onClick={() => navigate('/my-subscriptions')}>
-                    <div style={actionIconStyle}>📋</div>
-                    <h3 style={actionTitleStyle}>My Subscriptions</h3>
-                    <p style={actionDescStyle}>View and manage your active plans</p>
-                </div>
+            {/* Quick Actions */}
+            <Grid container spacing={3} sx={{ mb: 4 }}>
+                <Grid item xs={12} sm={6} md={4}>
+                    <Card 
+                        elevation={2} 
+                        sx={{ 
+                            height: '100%', 
+                            cursor: 'pointer',
+                            transition: 'all 0.3s',
+                            '&:hover': { 
+                                transform: 'translateY(-4px)', 
+                                boxShadow: 6 
+                            }
+                        }}
+                        onClick={() => navigate('/my-subscriptions')}
+                    >
+                        <CardContent sx={{ textAlign: 'center', py: 3 }}>
+                            <Subscriptions sx={{ fontSize: 40, color: 'primary.main', mb: 2 }} />
+                            <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
+                                My Subscriptions
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                                View and manage your active plans
+                            </Typography>
+                        </CardContent>
+                    </Card>
+                </Grid>
 
-                <div style={actionCardStyle} onClick={() => navigate('/recommendations')}>
-                    <div style={actionIconStyle}>🤖</div>
-                    <h3 style={actionTitleStyle}>AI Recommendations</h3>
-                    <p style={actionDescStyle}>Get personalized plan suggestions</p>
-                </div>
+                <Grid item xs={12} sm={6} md={4}>
+                    <Card 
+                        elevation={2} 
+                        sx={{ 
+                            height: '100%', 
+                            cursor: 'pointer',
+                            transition: 'all 0.3s',
+                            '&:hover': { 
+                                transform: 'translateY(-4px)', 
+                                boxShadow: 6 
+                            }
+                        }}
+                        onClick={() => navigate('/recommendations')}
+                    >
+                        <CardContent sx={{ textAlign: 'center', py: 3 }}>
+                            <Psychology sx={{ fontSize: 40, color: 'secondary.main', mb: 2 }} />
+                            <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
+                                AI Recommendations
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                                Get personalized plan suggestions
+                            </Typography>
+                        </CardContent>
+                    </Card>
+                </Grid>
 
-                <div style={actionCardStyle} onClick={() => navigate('/plans')}>
-                    <div style={actionIconStyle}>📊</div>
-                    <h3 style={actionTitleStyle}>Browse Plans</h3>
-                    <p style={actionDescStyle}>Explore available broadband plans</p>
-                </div>
+                <Grid item xs={12} sm={6} md={4}>
+                    <Card 
+                        elevation={2} 
+                        sx={{ 
+                            height: '100%', 
+                            cursor: 'pointer',
+                            transition: 'all 0.3s',
+                            '&:hover': { 
+                                transform: 'translateY(-4px)', 
+                                boxShadow: 6 
+                            }
+                        }}
+                        onClick={() => navigate('/plans')}
+                    >
+                        <CardContent sx={{ textAlign: 'center', py: 3 }}>
+                            <ViewList sx={{ fontSize: 40, color: 'success.main', mb: 2 }} />
+                            <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
+                                Browse Plans
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                                Explore available broadband plans
+                            </Typography>
+                        </CardContent>
+                    </Card>
+                </Grid>
 
-                <div style={actionCardStyle} onClick={() => navigate('/profile')}>
-                    <div style={actionIconStyle}>👤</div>
-                    <h3 style={actionTitleStyle}>Profile Settings</h3>
-                    <p style={actionDescStyle}>Update your account information</p>
-                </div>
+                <Grid item xs={12} sm={6} md={4}>
+                    <Card 
+                        elevation={2} 
+                        sx={{ 
+                            height: '100%', 
+                            cursor: 'pointer',
+                            transition: 'all 0.3s',
+                            '&:hover': { 
+                                transform: 'translateY(-4px)', 
+                                boxShadow: 6 
+                            }
+                        }}
+                        onClick={() => navigate('/profile')}
+                    >
+                        <CardContent sx={{ textAlign: 'center', py: 3 }}>
+                            <AccountCircle sx={{ fontSize: 40, color: 'warning.main', mb: 2 }} />
+                            <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
+                                Profile Settings
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                                Update your account information
+                            </Typography>
+                        </CardContent>
+                    </Card>
+                </Grid>
 
-                <div style={actionCardStyle} onClick={() => navigate('/discounts')}>
-                    <div style={actionIconStyle}>💰</div>
-                    <h3 style={actionTitleStyle}>Special Offers</h3>
-                    <p style={actionDescStyle}>View current discounts and promotions</p>
-                </div>
+                <Grid item xs={12} sm={6} md={4}>
+                    <Card 
+                        elevation={2} 
+                        sx={{ 
+                            height: '100%', 
+                            cursor: 'pointer',
+                            transition: 'all 0.3s',
+                            '&:hover': { 
+                                transform: 'translateY(-4px)', 
+                                boxShadow: 6 
+                            }
+                        }}
+                        onClick={() => navigate('/discounts')}
+                    >
+                        <CardContent sx={{ textAlign: 'center', py: 3 }}>
+                            <LocalOffer sx={{ fontSize: 40, color: 'error.main', mb: 2 }} />
+                            <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
+                                Special Offers
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                                View current discounts and promotions
+                            </Typography>
+                        </CardContent>
+                    </Card>
+                </Grid>
 
-                <div style={actionCardStyle} onClick={() => navigate('/upgrade-downgrade')}>
-                    <div style={actionIconStyle}>⚡</div>
-                    <h3 style={actionTitleStyle}>Upgrade/Downgrade</h3>
-                    <p style={actionDescStyle}>Change your subscription plan</p>
-                </div>
-            </div>
+                <Grid item xs={12} sm={6} md={4}>
+                    <Card 
+                        elevation={2} 
+                        sx={{ 
+                            height: '100%', 
+                            cursor: 'pointer',
+                            transition: 'all 0.3s',
+                            '&:hover': { 
+                                transform: 'translateY(-4px)', 
+                                boxShadow: 6 
+                            }
+                        }}
+                        onClick={() => navigate('/upgrade-downgrade')}
+                    >
+                        <CardContent sx={{ textAlign: 'center', py: 3 }}>
+                            <TrendingUp sx={{ fontSize: 40, color: 'primary.main', mb: 2 }} />
+                            <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
+                                Upgrade/Downgrade
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                                Change your subscription plan
+                            </Typography>
+                        </CardContent>
+                    </Card>
+                </Grid>
+            </Grid>
 
-            <div style={recentActivityStyle}>
-                <h2 style={sectionTitleStyle}>Recent Activity</h2>
-                <div style={activityListStyle}>
-                    <div style={activityItemStyle}>
-                        <div style={activityIconStyle}>✅</div>
-                        <div>
-                            <div style={activityTitleStyle}>Account Created</div>
-                            <div style={activityTimeStyle}>Welcome to Lumen Broadband!</div>
-                        </div>
-                    </div>
-                    <div style={activityItemStyle}>
-                        <div style={activityIconStyle}>🔐</div>
-                        <div>
-                            <div style={activityTitleStyle}>Login Successful</div>
-                            <div style={activityTimeStyle}>Last login: {user.lastLogin ? new Date(user.lastLogin).toLocaleString() : 'Just now'}</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+            {/* Recent Activity */}
+            <Paper elevation={3} sx={{ p: 3 }}>
+                <Typography variant="h5" sx={{ fontWeight: 600, mb: 3, color: 'primary.main' }}>
+                    Recent Activity
+                </Typography>
+                <Grid container spacing={2}>
+                    <Grid item xs={12} md={6}>
+                        <Card sx={{ p: 2, bgcolor: 'success.50', border: '1px solid', borderColor: 'success.200' }}>
+                            <Box display="flex" alignItems="center" gap={2}>
+                                <CheckCircle sx={{ color: 'success.main' }} />
+                                <Box>
+                                    <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                                        Account Created
+                                    </Typography>
+                                    <Typography variant="body2" color="text.secondary">
+                                        Welcome to Lumen Broadband!
+                                    </Typography>
+                                </Box>
+                            </Box>
+                        </Card>
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                        <Card sx={{ p: 2, bgcolor: 'primary.50', border: '1px solid', borderColor: 'primary.200' }}>
+                            <Box display="flex" alignItems="center" gap={2}>
+                                <Security sx={{ color: 'primary.main' }} />
+                                <Box>
+                                    <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                                        Login Successful
+                                    </Typography>
+                                    <Typography variant="body2" color="text.secondary">
+                                        Last login: {user.lastLogin ? new Date(user.lastLogin).toLocaleString() : 'Just now'}
+                                    </Typography>
+                                </Box>
+                            </Box>
+                        </Card>
+                    </Grid>
+                </Grid>
+            </Paper>
+        </Container>
     );
-};
-
-// Styles
-const containerStyle = {
-    minHeight: '100vh',
-    backgroundColor: '#f8fafc',
-    padding: '2rem'
-};
-
-const loadingStyle = {
-    minHeight: '100vh',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: '1.2rem',
-    color: '#64748b'
-};
-
-const headerStyle = {
-    backgroundColor: 'white',
-    borderRadius: '12px',
-    padding: '2rem',
-    marginBottom: '2rem',
-    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)'
-};
-
-const headerContentStyle = {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center'
-};
-
-const titleStyle = {
-    fontSize: '2rem',
-    fontWeight: 'bold',
-    color: '#1e3a8a',
-    marginBottom: '0.5rem'
-};
-
-const subtitleStyle = {
-    color: '#64748b',
-    fontSize: '1.1rem'
-};
-
-const logoutButtonStyle = {
-    backgroundColor: '#ef4444',
-    color: 'white',
-    border: 'none',
-    padding: '0.75rem 1.5rem',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    fontSize: '1rem',
-    fontWeight: '500'
-};
-
-const dashboardGridStyle = {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-    gap: '1.5rem',
-    marginBottom: '2rem'
-};
-
-const cardStyle = {
-    backgroundColor: 'white',
-    padding: '1.5rem',
-    borderRadius: '12px',
-    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)',
-    textAlign: 'center'
-};
-
-const cardTitleStyle = {
-    fontSize: '1rem',
-    color: '#64748b',
-    marginBottom: '0.5rem',
-    fontWeight: '500'
-};
-
-const statValueStyle = {
-    fontSize: '2rem',
-    fontWeight: 'bold',
-    color: '#1e3a8a',
-    marginBottom: '0.5rem'
-};
-
-const cardDescStyle = {
-    fontSize: '0.875rem',
-    color: '#94a3b8'
-};
-
-const actionGridStyle = {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-    gap: '1.5rem',
-    marginBottom: '2rem'
-};
-
-const actionCardStyle = {
-    backgroundColor: 'white',
-    padding: '1.5rem',
-    borderRadius: '12px',
-    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)',
-    cursor: 'pointer',
-    transition: 'transform 0.2s, box-shadow 0.2s',
-    textAlign: 'center'
-};
-
-const actionIconStyle = {
-    fontSize: '2.5rem',
-    marginBottom: '1rem'
-};
-
-const actionTitleStyle = {
-    fontSize: '1.25rem',
-    fontWeight: 'bold',
-    color: '#1e3a8a',
-    marginBottom: '0.5rem'
-};
-
-const actionDescStyle = {
-    color: '#64748b',
-    fontSize: '0.95rem'
-};
-
-const recentActivityStyle = {
-    backgroundColor: 'white',
-    padding: '2rem',
-    borderRadius: '12px',
-    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)'
-};
-
-const sectionTitleStyle = {
-    fontSize: '1.5rem',
-    fontWeight: 'bold',
-    color: '#1e3a8a',
-    marginBottom: '1.5rem'
-};
-
-const activityListStyle = {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '1rem'
-};
-
-const activityItemStyle = {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '1rem',
-    padding: '1rem',
-    backgroundColor: '#f8fafc',
-    borderRadius: '8px'
-};
-
-const activityIconStyle = {
-    fontSize: '1.5rem'
-};
-
-const activityTitleStyle = {
-    fontWeight: '500',
-    color: '#374151'
-};
-
-const activityTimeStyle = {
-    fontSize: '0.875rem',
-    color: '#64748b'
 };
 
 export default Dashboard;

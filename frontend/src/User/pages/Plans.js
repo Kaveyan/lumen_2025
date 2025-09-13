@@ -1,17 +1,50 @@
 // Browse all available plans
 
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 
 const Plans = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [subscribing, setSubscribing] = useState(null);
+  const [notification, setNotification] = useState({ show: false, message: '', type: 'success' });
+  const [appliedOffer, setAppliedOffer] = useState(null);
 
-  // Mock plans data (in real app, this would come from backend)
+  // Check for applied offer on component mount
+  useEffect(() => {
+    const savedOffer = localStorage.getItem('selectedOffer');
+    if (savedOffer) {
+      setAppliedOffer(JSON.parse(savedOffer));
+    }
+  }, []);
+
+  // Calculate discounted price
+  const calculateDiscountedPrice = (originalPrice, offer) => {
+    if (!offer) return originalPrice;
+    
+    switch (offer.discountType) {
+      case 'percentage':
+        return originalPrice * (1 - offer.discountPercentage / 100);
+      case 'fixed_amount':
+        return Math.max(0, originalPrice - offer.discountAmount);
+      default:
+        return originalPrice;
+    }
+  };
+
+  // Remove applied offer
+  const removeOffer = () => {
+    localStorage.removeItem('selectedOffer');
+    setAppliedOffer(null);
+  };
+
   const mockPlans = [
     {
-      id: 1,
+      id: 'basic-fiber',
       name: 'Basic Fiber',
       type: 'fiber',
       price: 39.99,
@@ -22,7 +55,7 @@ const Plans = () => {
       description: 'Perfect for light internet users and small households'
     },
     {
-      id: 2,
+      id: 'premium-fiber',
       name: 'Premium Fiber',
       type: 'fiber',
       price: 59.99,
@@ -33,7 +66,7 @@ const Plans = () => {
       description: 'Great for streaming, gaming, and medium-sized families'
     },
     {
-      id: 3,
+      id: 'ultra-fiber',
       name: 'Ultra Fiber',
       type: 'fiber',
       price: 89.99,
@@ -44,7 +77,7 @@ const Plans = () => {
       description: 'Maximum performance for power users and large households'
     },
     {
-      id: 4,
+      id: 'basic-copper',
       name: 'Basic Copper',
       type: 'copper',
       price: 29.99,
@@ -55,7 +88,7 @@ const Plans = () => {
       description: 'Affordable option for basic internet needs'
     },
     {
-      id: 5,
+      id: 'standard-copper',
       name: 'Standard Copper',
       type: 'copper',
       price: 39.99,
@@ -66,7 +99,7 @@ const Plans = () => {
       description: 'Reliable copper connection for everyday use'
     },
     {
-      id: 6,
+      id: 'business-fiber-pro',
       name: 'Business Fiber Pro',
       type: 'business',
       price: 149.99,
@@ -78,13 +111,90 @@ const Plans = () => {
     }
   ];
 
-  useEffect(() => {
-    // Simulate API call
-    setTimeout(() => {
+  const fetchPlans = useCallback(async () => {
+    try {
+      const response = await fetch('http://localhost:5000/api/subscriptions/plans');
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          setPlans(data.plans);
+        }
+      } else {
+        // Fallback to mock data if API fails
+        setPlans(mockPlans);
+      }
+    } catch (error) {
+      console.error('Error fetching plans:', error);
+      // Fallback to mock data
       setPlans(mockPlans);
+    } finally {
       setLoading(false);
-    }, 1000);
-  }, []);
+    }
+  }, [mockPlans]);
+
+  useEffect(() => {
+    fetchPlans();
+  }, [fetchPlans]);
+
+  const handleSelectPlan = async (planId) => {
+    if (!user) {
+      setNotification({ show: true, message: 'Please log in to subscribe to a plan', type: 'error' });
+      setTimeout(() => navigate('/login'), 2000);
+      return;
+    }
+
+    setSubscribing(planId);
+    try {
+      const token = localStorage.getItem('token');
+      console.log('Selecting plan:', planId);
+      console.log('Token exists:', !!token);
+      
+      const response = await fetch('http://localhost:5000/api/subscriptions/upgrade', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          newPlanId: planId,
+          billingCycle: 'monthly'
+        })
+      });
+
+      console.log('Response status:', response.status);
+      const data = await response.json();
+      console.log('Response data:', data);
+      
+      if (response.ok && data.success) {
+        setNotification({ 
+          show: true, 
+          message: `Successfully subscribed to ${plans.find(p => p.id === planId)?.name}! Redirecting to your subscriptions...`, 
+          type: 'success' 
+        });
+        setTimeout(() => navigate('/my-subscriptions'), 2000);
+      } else {
+        setNotification({ 
+          show: true, 
+          message: data.message || `Failed to subscribe to plan. Status: ${response.status}`, 
+          type: 'error' 
+        });
+      }
+    } catch (error) {
+      console.error('Plan selection error:', error);
+      setNotification({ 
+        show: true, 
+        message: `Error subscribing to plan: ${error.message}. Please try again.`, 
+        type: 'error' 
+      });
+    } finally {
+      setSubscribing(null);
+    }
+  };
+
+  const hideNotification = () => {
+    setNotification({ show: false, message: '', type: 'success' });
+  };
 
   const filteredPlans = selectedCategory === 'all' 
     ? plans 
@@ -135,22 +245,41 @@ const Plans = () => {
 
       {/* Plans Grid */}
       <div style={plansContainerStyle}>
+        {appliedOffer && (
+          <div style={offerBannerStyle}>
+            <div style={offerInfoStyle}>
+              <span style={offerBadgeStyle}>{appliedOffer.badge}</span>
+              <span style={offerTextStyle}>{appliedOffer.title} Applied!</span>
+            </div>
+            <button onClick={removeOffer} style={removeOfferStyle}>×</button>
+          </div>
+        )}
         <div style={plansGridStyle}>
-          {filteredPlans.map(plan => (
-            <div key={plan.id} style={planCardStyle}>
+          {filteredPlans.map((plan) => {
+            const originalPrice = plan.price;
+            const discountedPrice = calculateDiscountedPrice(originalPrice, appliedOffer);
+            const hasDiscount = appliedOffer && discountedPrice < originalPrice;
+            
+            return (
+              <div key={plan.id} style={planCardStyle}>
               {plan.popular && (
                 <div style={popularBadgeStyle}>Most Popular</div>
               )}
-              
               <div style={planHeaderStyle}>
                 <h3 style={planNameStyle}>{plan.name}</h3>
-                <div style={planPriceStyle}>
-                  ${plan.price}
-                  <span style={planPeriodStyle}>/month</span>
+                <div style={priceContainerStyle}>
+                  {hasDiscount ? (
+                    <>
+                      <span style={originalPriceStyle}>${originalPrice.toFixed(2)}</span>
+                      <span style={discountedPriceStyle}>${discountedPrice.toFixed(2)}</span>
+                    </>
+                  ) : (
+                    <span style={priceStyle}>${originalPrice}</span>
+                  )}
+                  <span style={periodStyle}>/month</span>
                 </div>
-                <p style={planDescStyle}>{plan.description}</p>
               </div>
-
+              <p style={planDescStyle}>{plan.description}</p>
               <div style={speedInfoStyle}>
                 <div style={speedItemStyle}>
                   <span style={speedLabelStyle}>Download</span>
@@ -161,7 +290,6 @@ const Plans = () => {
                   <span style={speedValueStyle}>{plan.uploadSpeed} Mbps</span>
                 </div>
               </div>
-
               <ul style={featuresListStyle}>
                 {plan.features.map((feature, index) => (
                   <li key={index} style={featureItemStyle}>
@@ -169,23 +297,39 @@ const Plans = () => {
                   </li>
                 ))}
               </ul>
-
               <div style={planActionsStyle}>
-                <Link 
-                  to={`/plans/${plan.id}`} 
+                <button 
+                  onClick={() => handleSelectPlan(plan.id)}
+                  disabled={subscribing === plan.id}
                   style={{
                     ...selectButtonStyle,
-                    ...(plan.popular ? popularButtonStyle : {})
+                    ...(plan.popular ? popularButtonStyle : {}),
+                    ...(subscribing === plan.id ? { opacity: 0.7, cursor: 'not-allowed' } : {}),
+                    border: 'none',
+                    cursor: subscribing === plan.id ? 'not-allowed' : 'pointer'
                   }}
                 >
-                  Select Plan
-                </Link>
-                <Link to={`/plans/${plan.id}`} style={detailsLinkStyle}>
+                  {subscribing === plan.id ? 'Subscribing...' : 'Select Plan'}
+                </button>
+                <button 
+                  onClick={() => {
+                    const planDetails = `Plan: ${plan.name}\nPrice: $${plan.price}/month\nDownload: ${plan.downloadSpeed} Mbps\nUpload: ${plan.uploadSpeed} Mbps\nFeatures: ${plan.features.join(', ')}`;
+                    alert(planDetails);
+                  }}
+                  style={{
+                    ...detailsLinkStyle,
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    padding: '0.5rem'
+                  }}
+                >
                   View Details
-                </Link>
+                </button>
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
@@ -201,6 +345,39 @@ const Plans = () => {
           </Link>
         </div>
       </div>
+
+      {/* Notification */}
+      {notification.show && (
+        <div style={{
+          position: 'fixed',
+          top: '20px',
+          right: '20px',
+          backgroundColor: notification.type === 'success' ? '#10b981' : '#ef4444',
+          color: 'white',
+          padding: '1rem 2rem',
+          borderRadius: '8px',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+          zIndex: 1000,
+          maxWidth: '400px'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span>{notification.message}</span>
+            <button 
+              onClick={hideNotification}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'white',
+                fontSize: '1.2rem',
+                cursor: 'pointer',
+                marginLeft: '1rem'
+              }}
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -328,18 +505,23 @@ const planNameStyle = {
   marginBottom: '1rem'
 };
 
-const planPriceStyle = {
-  fontSize: '2.5rem',
+
+const discountedPriceStyle = {
+  fontSize: '2rem',
   fontWeight: 'bold',
-  color: '#1e3a8a',
+  color: '#10b981'
+};
+
+const priceContainerStyle = {
   marginBottom: '1rem'
 };
 
-const planPeriodStyle = {
-  fontSize: '1rem',
-  fontWeight: 'normal',
-  color: '#64748b'
+const periodStyle = {
+  color: '#64748b',
+  fontSize: '0.9rem',
+  marginLeft: '0.25rem'
 };
+
 
 const planDescStyle = {
   color: '#64748b',
@@ -435,7 +617,7 @@ const ctaTitleStyle = {
 const ctaDescStyle = {
   fontSize: '1.1rem',
   marginBottom: '2rem',
-  opacity: '0.9'
+  opacity: 0.9
 };
 
 const ctaButtonStyle = {
@@ -445,9 +627,60 @@ const ctaButtonStyle = {
   borderRadius: '8px',
   textDecoration: 'none',
   fontWeight: 'bold',
-  fontSize: '1.1rem',
   display: 'inline-block',
-  transition: 'transform 0.3s'
+  transition: 'transform 0.2s'
+};
+
+const priceStyle = {
+  fontSize: '2rem',
+  fontWeight: 'bold',
+  color: '#374151'
+};
+
+const offerBannerStyle = {
+  backgroundColor: '#10b981',
+  color: 'white',
+  padding: '1rem',
+  borderRadius: '8px',
+  marginBottom: '2rem',
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center'
+};
+
+const offerInfoStyle = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '1rem'
+};
+
+const offerBadgeStyle = {
+  backgroundColor: 'rgba(255, 255, 255, 0.2)',
+  padding: '0.25rem 0.75rem',
+  borderRadius: '20px',
+  fontSize: '0.8rem',
+  fontWeight: 'bold'
+};
+
+const offerTextStyle = {
+  fontWeight: 'bold'
+};
+
+const removeOfferStyle = {
+  backgroundColor: 'transparent',
+  border: 'none',
+  color: 'white',
+  fontSize: '1.5rem',
+  cursor: 'pointer',
+  padding: '0.25rem 0.5rem',
+  borderRadius: '4px'
+};
+
+const originalPriceStyle = {
+  fontSize: '1.5rem',
+  color: '#9ca3af',
+  textDecoration: 'line-through',
+  marginRight: '0.5rem'
 };
 
 export default Plans;

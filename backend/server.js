@@ -5,6 +5,7 @@ require('dotenv').config();
 
 const aiRoutes = require('./routes/aiRoutes');
 const authRoutes = require('./routes/authRoutes');
+const subscriptionRoutes = require('./routes/subscriptionRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -24,9 +25,18 @@ mongoose.connect(process.env.MONGODB_URI)
         process.exit(1);
     });
 
+// Debug middleware to log all requests
+app.use((req, res, next) => {
+    console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+    next();
+});
+
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/ai', aiRoutes);
+app.use('/api/subscriptions', subscriptionRoutes);
+app.use('/api/offers', require('./routes/offersRoutes'));
+app.use('/api/admin', require('./routes/adminRoutes'));
 
 // Basic health check
 app.get('/health', (req, res) => {

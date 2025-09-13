@@ -28,6 +28,7 @@ import Recommendations from './User/pages/Recommendations';
 import Dashboard from './User/pages/Dashboard';
 import AdminDashboard from './admin/pages/AdminDashboard';
 import AdminRecommendations from './admin/pages/AdminRecommendations';
+import PaymentHistory from './admin/pages/PaymentHistory';
 
 function App() {
   return (
@@ -96,6 +97,11 @@ function App() {
                 <Route path="/admin/recommendations" element={
                   <ProtectedRoute adminOnly={true}>
                     <AdminRecommendations />
+                  </ProtectedRoute>
+                } />
+                <Route path="/admin/payments" element={
+                  <ProtectedRoute adminOnly={true}>
+                    <PaymentHistory />
                   </ProtectedRoute>
                 } />
               </Routes>

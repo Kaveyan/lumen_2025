@@ -1,25 +1,66 @@
 // Track current offers and promotions
 
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import subscriptionService from '../../services/subscriptionService';
 
 const Discounts = () => {
-  const offers = [
-    {
-      id: 1,
-      title: 'New Customer Special',
-      discount: '50% OFF',
-      description: 'First 3 months at half price',
-      validUntil: '2025-03-31'
-    },
-    {
-      id: 2,
-      title: 'Upgrade Bonus',
-      discount: 'FREE Router',
-      description: 'Free premium router with fiber upgrade',
-      validUntil: '2025-02-28'
+  const [offers, setOffers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    loadOffers();
+  }, []);
+
+  const loadOffers = async () => {
+    try {
+      setLoading(true);
+      const response = await subscriptionService.getActiveOffers();
+      if (response.success) {
+        setOffers(response.offers);
+      } else {
+        setError('Failed to load offers');
+      }
+    } catch (err) {
+      console.error('Error loading offers:', err);
+      setError('Failed to load offers');
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
+
+  const applyOffer = (offer) => {
+    // Store the selected offer in localStorage for use in plans/checkout
+    localStorage.setItem('selectedOffer', JSON.stringify(offer));
+    
+    // Show confirmation and redirect to plans
+    alert(`${offer.title} applied! You'll see discounted prices on the plans page.`);
+    
+    // Redirect to plans page where discount will be applied
+    window.location.href = '/plans';
+  };
+
+  if (loading) {
+    return (
+      <div style={containerStyle}>
+        <div style={loadingStyle}>
+          <div style={spinnerStyle}>⏳</div>
+          <p>Loading offers...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div style={containerStyle}>
+        <div style={errorStyle}>
+          <p>{error}</p>
+          <button onClick={loadOffers} style={retryButtonStyle}>Retry</button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={containerStyle}>
@@ -28,17 +69,34 @@ const Discounts = () => {
         <p style={subtitleStyle}>Save money with our current promotions</p>
       </div>
       
-      <div style={offersGridStyle}>
-        {offers.map(offer => (
-          <div key={offer.id} style={offerCardStyle}>
-            <div style={discountBadgeStyle}>{offer.discount}</div>
-            <h3 style={offerTitleStyle}>{offer.title}</h3>
-            <p style={offerDescStyle}>{offer.description}</p>
-            <p style={validUntilStyle}>Valid until: {offer.validUntil}</p>
-            <Link to="/plans" style={claimButtonStyle}>View Plans</Link>
-          </div>
-        ))}
-      </div>
+      {offers.length === 0 ? (
+        <div style={noOffersStyle}>
+          <p>No active offers at the moment. Check back soon!</p>
+        </div>
+      ) : (
+        <div style={offersGridStyle}>
+          {offers.map(offer => {
+            const validUntilDate = new Date(offer.validUntil).toLocaleDateString();
+            return (
+              <div key={offer._id} style={offerCardStyle}>
+                <div style={discountBadgeStyle}>{offer.badge}</div>
+                <h3 style={offerTitleStyle}>{offer.title}</h3>
+                <p style={offerDescStyle}>{offer.description}</p>
+                <p style={validUntilStyle}>Valid until: {validUntilDate}</p>
+                {offer.terms && (
+                  <p style={termsStyle}>{offer.terms}</p>
+                )}
+                <button 
+                  onClick={() => applyOffer(offer)}
+                  style={claimButtonStyle}
+                >
+                  Apply Offer
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };
@@ -116,7 +174,53 @@ const claimButtonStyle = {
   padding: '1rem 2rem',
   borderRadius: '8px',
   textDecoration: 'none',
-  fontWeight: 'bold'
+  fontWeight: 'bold',
+  display: 'inline-block',
+  transition: 'background-color 0.2s'
+};
+
+const loadingStyle = {
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+  minHeight: '50vh',
+  color: '#64748b'
+};
+
+const spinnerStyle = {
+  fontSize: '2rem',
+  marginBottom: '1rem'
+};
+
+const errorStyle = {
+  textAlign: 'center',
+  padding: '2rem',
+  color: '#ef4444'
+};
+
+const retryButtonStyle = {
+  backgroundColor: '#1e3a8a',
+  color: 'white',
+  padding: '0.75rem 1.5rem',
+  borderRadius: '8px',
+  border: 'none',
+  cursor: 'pointer',
+  marginTop: '1rem'
+};
+
+const noOffersStyle = {
+  textAlign: 'center',
+  padding: '3rem',
+  color: '#64748b',
+  fontSize: '1.1rem'
+};
+
+const termsStyle = {
+  fontSize: '0.8rem',
+  color: '#64748b',
+  fontStyle: 'italic',
+  marginBottom: '1rem'
 };
 
 export default Discounts;

@@ -96,7 +96,7 @@ const Navbar = () => {
       </Typography>
       <List>
         {navigationItems.map((item) => (
-          <ListItem key={item.label} component={Link} to={item.path} button>
+          <ListItem key={item.label} component={Link} to={item.path} sx={{ cursor: 'pointer' }}>
             <ListItemIcon sx={{ color: 'primary.main' }}>
               {item.icon}
             </ListItemIcon>
@@ -104,7 +104,7 @@ const Navbar = () => {
           </ListItem>
         ))}
         {!user && (
-          <ListItem component={Link} to="/login" button>
+          <ListItem component={Link} to="/login" sx={{ cursor: 'pointer' }}>
             <ListItemIcon sx={{ color: 'primary.main' }}>
               <Login />
             </ListItemIcon>

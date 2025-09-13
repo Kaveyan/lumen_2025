@@ -41,7 +41,7 @@ const userSchema = new mongoose.Schema({
     },
     currentPlan: {
         type: String,
-        default: 'basic'
+        default: null
     },
     subscriptionStatus: {
         type: String,

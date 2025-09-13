@@ -1,335 +1,370 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import {
-  Container,
-  Typography,
-  Card,
-  CardContent,
-  Box,
-  Chip,
-  Grid,
-  Button,
-  LinearProgress,
-  Divider,
-  Paper,
-  CircularProgress,
-} from '@mui/material';
-import {
-  Speed,
-  Upload,
-  Download,
-  CalendarToday,
-  CheckCircle,
-  TrendingUp,
-  Psychology,
-  ViewList,
-  LocalOffer,
-} from '@mui/icons-material';
-import { useAuth } from '../../contexts/AuthContext';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import subscriptionService from '../../services/subscriptionService';
 
-const MySubscriptions = () => {
-  const { user } = useAuth();
-  const [subscriptions, setSubscriptions] = useState([]);
+const UpgradeDowngrade = () => {
+  const [currentSubscription, setCurrentSubscription] = useState(null);
+  const [availablePlans, setAvailablePlans] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [switching, setSwitching] = useState(false);
+  const navigate = useNavigate();
 
-  // Mock subscriptions data
-  const mockSubscriptions = [
-    {
-      id: 1,
-      planName: 'Premium Fiber',
-      status: 'active',
-      price: 59.99,
-      downloadSpeed: 500,
-      uploadSpeed: 100,
-      startDate: '2024-01-15',
-      nextBilling: '2025-02-15',
-      features: ['Unlimited Data', 'Free Router', 'Priority Support'],
-      usageThisMonth: {
-        download: 450, // GB
-        upload: 120,
-        totalAllowed: 'unlimited'
+  const loadData = useCallback(async () => {
+    try {
+      setLoading(true);
+      const [plansResponse, subscriptionResponse] = await Promise.all([
+        subscriptionService.getAvailablePlans(),
+        subscriptionService.getCurrentSubscription()
+      ]);
+      
+      if (plansResponse.success) {
+        setAvailablePlans(plansResponse.plans);
       }
+      
+      if (subscriptionResponse.success && subscriptionResponse.subscription) {
+        setCurrentSubscription(subscriptionResponse.subscription);
+      } else {
+        // No active subscription, redirect to home
+        navigate('/');
+        return;
+      }
+    } catch (err) {
+      setError('Failed to load subscription data');
+      console.error('Error loading data:', err);
+    } finally {
+      setLoading(false);
     }
-  ];
+  }, [navigate]);
 
   useEffect(() => {
-    setLoading(true);
+    loadData();
+  }, [loadData]);
 
-    // Simulate API call
-    setTimeout(() => {
-      setSubscriptions(mockSubscriptions);
-      setLoading(false);
-    }, 1000);
-  }, []);
-
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
+  const handleSelectPlan = async (plan) => {
+    if (!currentSubscription || switching) return;
+    
+    try {
+      setSwitching(true);
+      const isUpgrade = plan.price > currentSubscription.price;
+      
+      let response;
+      if (isUpgrade) {
+        response = await subscriptionService.upgradeSubscription(plan.id);
+      } else {
+        response = await subscriptionService.downgradeSubscription(plan.id);
+      }
+      
+      if (response.success) {
+        alert(response.message);
+        await loadData(); // Refresh data
+      }
+    } catch (err) {
+      alert(`Failed to switch plan: ${err.message}`);
+    } finally {
+      setSwitching(false);
+    }
   };
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'active': return '#10b981';
-      case 'suspended': return '#f59e0b';
-      case 'cancelled': return '#ef4444';
-      default: return '#6b7280';
+  const handleCancelSubscription = async () => {
+    if (!currentSubscription || switching) return;
+    
+    const reason = prompt('Please provide a reason for cancellation (optional):');
+    if (reason === null) return; // User clicked cancel
+    
+    const confirmCancel = window.confirm(
+      `Are you sure you want to cancel your ${currentSubscription.planName} subscription? This action cannot be undone.`
+    );
+    
+    if (!confirmCancel) return;
+    
+    try {
+      setSwitching(true);
+      const response = await subscriptionService.cancelSubscription(reason);
+      
+      if (response.success) {
+        alert(response.message);
+        navigate('/'); // Redirect to home page
+      }
+    } catch (err) {
+      alert(`Failed to cancel subscription: ${err.message}`);
+    } finally {
+      setSwitching(false);
     }
   };
 
   if (loading) {
     return (
-      <Container maxWidth="lg" sx={{ py: 4 }}>
-        <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" minHeight="50vh">
-          <CircularProgress size={60} sx={{ mb: 2 }} />
-          <Typography variant="h6" color="text.secondary">
-            Loading your subscriptions...
-          </Typography>
-        </Box>
-      </Container>
+      <div style={containerStyle}>
+        <div style={loadingStyle}>
+          <div style={spinnerStyle}>⏳</div>
+          <p>Loading plans...</p>
+        </div>
+      </div>
     );
   }
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h3" component="h1" gutterBottom sx={{ fontWeight: 700, color: 'primary.main' }}>
-          My Subscriptions
-        </Typography>
-        {user && (
-          <Typography variant="h6" color="text.secondary">
-            Welcome back, {user.firstName || user.name}!
-          </Typography>
-        )}
-      </Box>
+    <div style={containerStyle}>
+      <div style={pageWrapperStyle}>
+        <div style={headerStyle}>
+          <h1 style={titleStyle}>Change Your Plan</h1>
+          {error && (
+            <div style={{ color: 'red', marginBottom: '1rem', textAlign: 'center' }}>
+              {error}
+            </div>
+          )}
+          <p style={descStyle}>
+            You are currently on the <strong>{currentSubscription?.planName}</strong> plan.
+            Choose a new plan below.
+          </p>
+        </div>
 
-      {subscriptions.length === 0 ? (
-        <Paper sx={{ p: 6, textAlign: 'center', my: 4 }}>
-          <Typography variant="h1" sx={{ fontSize: '4rem', mb: 2 }}>📡</Typography>
-          <Typography variant="h4" gutterBottom color="primary.main">
-            No Active Subscriptions
-          </Typography>
-          <Typography variant="body1" color="text.secondary" sx={{ mb: 4, maxWidth: 600, mx: 'auto' }}>
-            You don't have any active subscriptions yet. Browse our plans to get started.
-          </Typography>
-          <Button
-            component={Link}
-            to="/plans"
-            variant="contained"
-            size="large"
-            sx={{ px: 4, py: 1.5 }}
+        <div style={plansContainerStyle}>
+          {availablePlans.map((plan) => {
+            const isCurrentPlan = plan.id === currentSubscription?.planId;
+            const isUpgrade = plan.price > (currentSubscription?.price || 0);
+
+            return (
+              <div
+                key={plan.id}
+                style={{
+                  ...planCardStyle,
+                  borderColor: isCurrentPlan ? '#1e3a8a' : '#e2e8f0',
+                  transform: isCurrentPlan ? 'scale(1.02)' : 'none',
+                }}
+              >
+                {isCurrentPlan && <div style={currentPlanBadgeStyle}>Current Plan</div>}
+                {!isCurrentPlan && (
+                  <div
+                    style={{
+                      ...planTagStyle,
+                      backgroundColor: isUpgrade ? '#10b981' : '#f59e0b',
+                    }}
+                  >
+                    {isUpgrade ? 'Upgrade' : 'Downgrade'}
+                  </div>
+                )}
+                <h3 style={planNameStyle}>{plan.name}</h3>
+                <div style={priceContainerStyle}>
+                  <span style={priceStyle}>${plan.price}</span>
+                  <span style={periodStyle}>/month</span>
+                </div>
+                <div style={speedInfoStyle}>
+                  <span>↓ {plan.downloadSpeed} Mbps</span>
+                  <span>↑ {plan.uploadSpeed} Mbps</span>
+                </div>
+                <ul style={featuresListStyle}>
+                  {plan.features.map((feature, index) => (
+                    <li key={index} style={featureItemStyle}>✓ {feature}</li>
+                  ))}
+                </ul>
+                <button
+                  onClick={() => handleSelectPlan(plan)}
+                  disabled={isCurrentPlan || switching}
+                  style={isCurrentPlan || switching ? disabledButtonStyle : buttonStyle}
+                >
+                  {isCurrentPlan ? 'Your Current Plan' : switching ? 'Processing...' : 'Switch to this Plan'}
+                </button>
+              </div>
+            );
+          })}
+        </div>
+         <div style={backLinkContainerStyle}>
+          <button
+            onClick={handleCancelSubscription}
+            disabled={switching}
+            style={cancelButtonStyle}
           >
-            Browse Plans
-          </Button>
-        </Paper>
-      ) : (
-        <Grid container spacing={3}>
-          {subscriptions.map(subscription => (
-            <Grid item xs={12} key={subscription.id}>
-              <Card sx={{ p: 3, borderRadius: 3, boxShadow: 3 }}>
-                <CardContent>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }}>
-                    <Box>
-                      <Typography variant="h4" component="h3" gutterBottom sx={{ fontWeight: 700, color: 'primary.main' }}>
-                        {subscription.planName}
-                      </Typography>
-                      <Chip
-                        label={subscription.status.toUpperCase()}
-                        color={subscription.status === 'active' ? 'success' : 'warning'}
-                        sx={{ fontWeight: 600 }}
-                      />
-                    </Box>
-                    <Box sx={{ textAlign: 'right' }}>
-                      <Typography variant="h3" component="span" sx={{ fontWeight: 700, color: 'primary.main' }}>
-                        ${subscription.price}
-                      </Typography>
-                      <Typography variant="h6" component="span" color="text.secondary">
-                        /month
-                      </Typography>
-                    </Box>
-                  </Box>
-
-                  <Paper sx={{ p: 2, mb: 3, bgcolor: 'grey.50' }}>
-                    <Grid container spacing={3}>
-                      <Grid item xs={6}>
-                        <Box sx={{ textAlign: 'center' }}>
-                          <Download sx={{ fontSize: 40, color: 'primary.main', mb: 1 }} />
-                          <Typography variant="body2" color="text.secondary">Download</Typography>
-                          <Typography variant="h5" sx={{ fontWeight: 700, color: 'primary.main' }}>
-                            {subscription.downloadSpeed} Mbps
-                          </Typography>
-                        </Box>
-                      </Grid>
-                      <Grid item xs={6}>
-                        <Box sx={{ textAlign: 'center' }}>
-                          <Upload sx={{ fontSize: 40, color: 'primary.main', mb: 1 }} />
-                          <Typography variant="body2" color="text.secondary">Upload</Typography>
-                          <Typography variant="h5" sx={{ fontWeight: 700, color: 'primary.main' }}>
-                            {subscription.uploadSpeed} Mbps
-                          </Typography>
-                        </Box>
-                      </Grid>
-                    </Grid>
-                  </Paper>
-
-                  <Box sx={{ mb: 3 }}>
-                    <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <TrendingUp /> This Month's Usage
-                    </Typography>
-                    <Grid container spacing={2}>
-                      <Grid item xs={6}>
-                        <Typography variant="body2" color="text.secondary">Downloaded</Typography>
-                        <Typography variant="h6" sx={{ fontWeight: 700, color: 'primary.main' }}>
-                          {subscription.usageThisMonth.download} GB
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={6}>
-                        <Typography variant="body2" color="text.secondary">Uploaded</Typography>
-                        <Typography variant="h6" sx={{ fontWeight: 700, color: 'primary.main' }}>
-                          {subscription.usageThisMonth.upload} GB
-                        </Typography>
-                      </Grid>
-                    </Grid>
-                  </Box>
-
-                  <Grid container spacing={2} sx={{ mb: 3 }}>
-                    <Grid item xs={12} sm={6}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                        <CalendarToday sx={{ fontSize: 20, color: 'text.secondary' }} />
-                        <Typography variant="body2" color="text.secondary">Start Date</Typography>
-                      </Box>
-                      <Typography variant="body1" sx={{ fontWeight: 600 }}>
-                        {formatDate(subscription.startDate)}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                        <CalendarToday sx={{ fontSize: 20, color: 'text.secondary' }} />
-                        <Typography variant="body2" color="text.secondary">Next Billing</Typography>
-                      </Box>
-                      <Typography variant="body1" sx={{ fontWeight: 600 }}>
-                        {formatDate(subscription.nextBilling)}
-                      </Typography>
-                    </Grid>
-                  </Grid>
-
-                  <Box sx={{ mb: 3 }}>
-                    <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
-                      Plan Features
-                    </Typography>
-                    <Grid container spacing={1}>
-                      {subscription.features.map((feature, index) => (
-                        <Grid item xs={12} sm={6} key={index}>
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <CheckCircle sx={{ fontSize: 20, color: 'success.main' }} />
-                            <Typography variant="body2">{feature}</Typography>
-                          </Box>
-                        </Grid>
-                      ))}
-                    </Grid>
-                  </Box>
-
-                  <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-                    <Button
-                      component={Link}
-                      to="/upgrade-downgrade"
-                      variant="contained"
-                      size="large"
-                      sx={{ flex: 1, minWidth: 200 }}
-                    >
-                      Upgrade/Downgrade
-                    </Button>
-                    <Button
-                      component={Link}
-                      to="/cancel-renew"
-                      variant="outlined"
-                      size="large"
-                      sx={{ flex: 1, minWidth: 200 }}
-                    >
-                      Manage Subscription
-                    </Button>
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
-      )}
-
-      <Box sx={{ mt: 6 }}>
-        <Typography variant="h4" gutterBottom sx={{ fontWeight: 700, color: 'primary.main', mb: 3 }}>
-          Quick Actions
-        </Typography>
-        <Grid container spacing={3}>
-          <Grid item xs={12} sm={6} md={4}>
-            <Card component={Link} to="/recommendations" sx={{ 
-              p: 3, 
-              textAlign: 'center', 
-              textDecoration: 'none', 
-              borderRadius: 3,
-              transition: 'all 0.3s ease',
-              '&:hover': { 
-                transform: 'translateY(-4px)', 
-                boxShadow: 6 
-              }
-            }}>
-              <Psychology sx={{ fontSize: 60, color: 'primary.main', mb: 2 }} />
-              <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: 'primary.main' }}>
-                AI Recommendations
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Get personalized plan suggestions
-              </Typography>
-            </Card>
-          </Grid>
-          <Grid item xs={12} sm={6} md={4}>
-            <Card component={Link} to="/plans" sx={{ 
-              p: 3, 
-              textAlign: 'center', 
-              textDecoration: 'none', 
-              borderRadius: 3,
-              transition: 'all 0.3s ease',
-              '&:hover': { 
-                transform: 'translateY(-4px)', 
-                boxShadow: 6 
-              }
-            }}>
-              <ViewList sx={{ fontSize: 60, color: 'primary.main', mb: 2 }} />
-              <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: 'primary.main' }}>
-                Browse Plans
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Explore all available plans
-              </Typography>
-            </Card>
-          </Grid>
-          <Grid item xs={12} sm={6} md={4}>
-            <Card component={Link} to="/discounts" sx={{ 
-              p: 3, 
-              textAlign: 'center', 
-              textDecoration: 'none', 
-              borderRadius: 3,
-              transition: 'all 0.3s ease',
-              '&:hover': { 
-                transform: 'translateY(-4px)', 
-                boxShadow: 6 
-              }
-            }}>
-              <LocalOffer sx={{ fontSize: 60, color: 'primary.main', mb: 2 }} />
-              <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: 'primary.main' }}>
-                Special Offers
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Check current promotions
-              </Typography>
-            </Card>
-          </Grid>
-        </Grid>
-      </Box>
-    </Container>
+            {switching ? 'Processing...' : 'Cancel My Subscription'}
+          </button>
+          <Link to="/my-subscriptions" style={backLinkStyle}>
+            &larr; Back to My Subscriptions
+          </Link>
+        </div>
+      </div>
+    </div>
   );
 };
 
-export default MySubscriptions;
+// --- Styles ---
+
+const containerStyle = {
+  minHeight: '100vh',
+  backgroundColor: '#f8fafc',
+  padding: '2rem',
+};
+
+const pageWrapperStyle = {
+  maxWidth: '1200px',
+  margin: '0 auto',
+};
+
+const loadingStyle = {
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+  color: '#64748b'
+};
+
+const spinnerStyle = {
+  fontSize: '2rem',
+  marginBottom: '1rem'
+};
+
+const headerStyle = {
+  textAlign: 'center',
+  marginBottom: '3rem',
+};
+
+const titleStyle = {
+  fontSize: '2.5rem',
+  color: '#1e3a8a',
+  marginBottom: '0.5rem',
+};
+
+const descStyle = {
+  color: '#64748b',
+  fontSize: '1.1rem',
+};
+
+const plansContainerStyle = {
+  display: 'grid',
+  gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+  gap: '2rem',
+};
+
+const planCardStyle = {
+  backgroundColor: 'white',
+  padding: '2rem',
+  borderRadius: '12px',
+  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
+  border: '2px solid transparent',
+  display: 'flex',
+  flexDirection: 'column',
+  position: 'relative',
+  transition: 'transform 0.2s, box-shadow 0.2s',
+};
+
+const currentPlanBadgeStyle = {
+  position: 'absolute',
+  top: '1rem',
+  right: '1rem',
+  backgroundColor: '#1e3a8a',
+  color: 'white',
+  padding: '0.25rem 0.75rem',
+  borderRadius: '20px',
+  fontSize: '0.75rem',
+  fontWeight: 'bold',
+};
+
+const planTagStyle = {
+  position: 'absolute',
+  top: '1rem',
+  right: '1rem',
+  color: 'white',
+  padding: '0.25rem 0.75rem',
+  borderRadius: '20px',
+  fontSize: '0.75rem',
+  fontWeight: 'bold',
+};
+
+const planNameStyle = {
+  fontSize: '1.5rem',
+  color: '#1e3a8a',
+  marginBottom: '0.5rem',
+  fontWeight: 'bold',
+};
+
+const priceContainerStyle = {
+  marginBottom: '1.5rem',
+};
+
+const priceStyle = {
+  fontSize: '2.25rem',
+  fontWeight: 'bold',
+  color: '#374151',
+};
+
+const periodStyle = {
+  fontSize: '1rem',
+  color: '#64748b',
+  marginLeft: '0.25rem'
+};
+
+const speedInfoStyle = {
+  display: 'flex',
+  justifyContent: 'space-around',
+  backgroundColor: '#f8fafc',
+  padding: '0.75rem',
+  borderRadius: '8px',
+  marginBottom: '1.5rem',
+  color: '#1e3a8a',
+  fontWeight: '600',
+};
+
+const featuresListStyle = {
+  listStyle: 'none',
+  padding: '0',
+  margin: '0 0 2rem 0',
+  flexGrow: '1',
+};
+
+const featureItemStyle = {
+  color: '#374151',
+  marginBottom: '0.5rem',
+};
+
+const buttonStyle = {
+  backgroundColor: '#1e3a8a',
+  color: 'white',
+  padding: '1rem',
+  borderRadius: '8px',
+  textDecoration: 'none',
+  fontWeight: 'bold',
+  textAlign: 'center',
+  border: 'none',
+  cursor: 'pointer',
+  transition: 'background-color 0.2s'
+};
+
+const disabledButtonStyle = {
+  ...buttonStyle,
+  backgroundColor: '#9ca3af',
+  cursor: 'not-allowed',
+};
+
+const backLinkContainerStyle = {
+    textAlign: 'center',
+    marginTop: '3rem',
+};
+
+const backLinkStyle = {
+    color: '#1e3a8a',
+    textDecoration: 'none',
+    fontWeight: '600',
+};
+
+const cancelButtonStyle = {
+    backgroundColor: '#dc2626',
+    color: 'white',
+    padding: '0.75rem 1.5rem',
+    borderRadius: '8px',
+    border: 'none',
+    fontWeight: 'bold',
+    cursor: 'pointer',
+    marginBottom: '1rem',
+    fontSize: '0.9rem',
+    transition: 'background-color 0.2s',
+    '&:hover': {
+        backgroundColor: '#b91c1c'
+    },
+    '&:disabled': {
+        backgroundColor: '#9ca3af',
+        cursor: 'not-allowed'
+    }
+};
+
+export default UpgradeDowngrade;
+
